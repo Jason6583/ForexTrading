@@ -1,0 +1,135 @@
+﻿<UserControl x:Class="LiveChart.LiveChartControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LiveChart"
+             mc:Ignorable="d" 
+             d:DesignWidth="390.5" 
+             d:DesignHeight="294.5" 
+             x:Name="LinearChartControl" 
+             Loaded="LinearChartControl_Loaded" 
+            
+             >
+
+    <Grid x:Name="GridMain" >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="Border_YAxisLegend" Grid.Column="0" Background="Transparent"
+                    Height="{Binding ElementName=LinearChartControl, Path=ActualHeight}"  
+                    HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid x:Name="Grid_YAxisScale">
+                    <!--<Grid.RowDefinitions>
+                        <RowDefinition  Height="*"/>
+                        <RowDefinition  Height="*"/>
+                        <RowDefinition  Height="*"/>
+                    </Grid.RowDefinitions>-->
+
+                    <Label Grid.Row="2" x:Name="Label_MaxY" Content="{Binding ElementName=LinearChartControl, Path=MaxValue}" 
+                           VerticalAlignment="Top" Foreground="#3FF8F8FF" FontSize="15" Panel.ZIndex="-5"/>
+
+                    <Label Grid.Row="2" x:Name="Label_MinY" Content="{Binding ElementName=LinearChartControl, Path=MinValue}" 
+                           VerticalAlignment="Bottom" Foreground="#3FF8F8FF" FontSize="15" Panel.ZIndex="-5"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Canvas Grid.Column="1" x:Name="CanvasMain" Grid.Row="0" ClipToBounds="True">
+                            <Canvas>
+                                <Path Fill="{Binding ElementName=LinearChartControl, Path=ChunkColor}" 
+                                  Stroke="{Binding ElementName=LinearChartControl, Path=LineColor}"
+                                  StrokeThickness="4">
+                                    <Path.Data>
+                                        <PathGeometry>
+                                            <PathFigure>
+                                                <PathFigure.StartPoint>
+                                                    <Point X="0" Y="2147483647"/>
+                                                </PathFigure.StartPoint>
+                                                <PathFigure.Segments>
+                                                    <LineSegment Point="40,210" />
+                                                    <LineSegment Point="80,230" />
+
+                                                    <LineSegment Point="80,230" />
+                                                    <LineSegment Point="120,200" />
+                                                    <LineSegment Point="160,200" />
+                                                    <LineSegment Point="160,2147483647" IsStroked="False"/>
+                                                </PathFigure.Segments>
+                                            </PathFigure>
+                                        </PathGeometry>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                            <Ellipse x:Name="Dot" 
+                         Width="10" 
+                         Height="10"
+                         Fill="{Binding ElementName=LinearChartControl,Path=DotColor}" 
+                         Panel.ZIndex="100"           
+                         Canvas.Top="195"
+                         Canvas.Left="155"/>
+
+                            <TextBlock x:Name="ActualValueText"
+                         Margin="-5,-20,0,0" 
+                         Text="100" 
+                         Panel.ZIndex="100"
+                         Canvas.Top="195"
+                         Canvas.Left="155"/>
+                        </Canvas>
+
+                        <Line Grid.Column="0" x:Name="YAxis"
+                         X1="0" 
+                         Y1="0" 
+                         X2="0" 
+                        Y2="{Binding ElementName=CanvasMain, Path=ActualHeight}" 
+                        Stroke="{Binding ElementName=LinearChartControl,Path=AxisColor}" 
+                        StrokeThickness="4"/>
+
+                    </Grid>
+                </Grid>
+
+                <Line x:Name="XAxis" 
+                      X1="{Binding ElementName=YAxis, Path=ActualWidth}" 
+                      Y1="{Binding ElementName=CanvasMain, Path=ActualHeight}"
+                      X2="{Binding ElementName=CanvasMain, Path=ActualWidth}" 
+                      Y2="{Binding ElementName=CanvasMain, Path=ActualHeight}" 
+                      Stroke="{Binding ElementName=LinearChartControl,Path=AxisColor}" 
+                      StrokeThickness="8"
+                      Grid.Row="0"
+                      />
+
+                <Border Grid.Row="2" Background="Transparent" 
+                        Width="{Binding ElementName=CanvasMain, Path=ActualWidth}"  HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom">
+                    <Grid x:Name="Grid_XAxisScale">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition  Width="*"/>
+                            <ColumnDefinition  Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+
+                        <Label Grid.Column="0" x:Name="Label_MaxX" Content="1" HorizontalAlignment="Left" Foreground="#3FF8F8FF" FontSize="10"/>
+                        <Label Grid.Column="1" x:Name="Label_MinX" Content="10" HorizontalAlignment="Center" Foreground="#3FF8F8FF" FontSize="10"/>
+                    </Grid>
+                </Border>
+
+
+            </Grid>
+        </Grid>
+
+
+    </Grid>
+</UserControl>

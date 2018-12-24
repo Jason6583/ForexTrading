@@ -1,0 +1,119 @@
+﻿<Page x:Class="ForexTrading.Pages.ForexPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ForexTrading.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="950"
+      Title="ForexPage"
+      xmlns:linechart="clr-namespace:LiveChart;assembly=LiveChart"
+      >
+
+    <Grid>
+
+      <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="Grid_TraidingPairs" 
+              Background="{StaticResource GrayBlack}" 
+              Width="100" 
+              HorizontalAlignment="Left" 
+              Height="0" 
+              VerticalAlignment="Top"
+              Panel.ZIndex="1"
+              Grid.Row="1"
+        >
+            <ListView 
+                Background="{StaticResource GrayBlackLighterWithOpacity}" 
+                BorderThickness="0" 
+                ItemContainerStyle="{StaticResource LvItemStyle}"
+                Grid.Column="0"
+                x:Name="ListView_TraidingPairsMenu"
+            >
+            </ListView>
+        </Grid>
+
+        <Border Background="{StaticResource GrayBlackDarker}"/>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="pecho4" 
+                   Style="{StaticResource MenuTextBlockStyle}" 
+                   HorizontalAlignment="Right"
+                   FontSize="15"
+                   Margin="5"
+                   Grid.Column="1"/>
+
+            <TextBlock Text="Trading pairs" 
+                       Style="{StaticResource MenuTextBlockStyle}" 
+                       HorizontalAlignment="Left"
+                       FontSize="15"
+                       Margin="5"
+                       Grid.Column="0" 
+                       PreviewMouseDown="TextBlock_Trading_Pairs_PreviewMouseDown"
+                       />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListView 
+                    Background="{StaticResource GrayBlackLighterWithOpacity}" 
+                    BorderThickness="0" 
+                    ItemContainerStyle="{StaticResource LvItemStyle}"
+                    Grid.Column="0"
+                    x:Name="ListView_Menu"
+                  >
+
+                <TextBlock Style="{StaticResource MenuTextBlockStyle}" FontSize="15" PreviewMouseDown="TextBlock_PreviewMouseDown" Margin="5" >
+                <Run Text="    TOTAL"/>
+                <LineBreak/>
+                <Run Text="PORTFOLIO"/>
+                </TextBlock>
+            </ListView>
+
+            <Frame x:Name="Frame_Menu" Grid.Column="1"/>
+
+            <linechart:LiveChartControl Grid.Column="2" 
+                                        x:Name="Chart" 
+                                        LineColor="#FFFFA728" 
+                                        DotColor="#FFFFF97A" 
+                                        DataSource="{Binding EurUsD}" 
+                                        Foreground="#FFFFAF3B" 
+                                        FontSize="15" 
+                                        AxisColor="#18FFA728" Margin="0" 
+                                        MinValue="0.075" 
+                                        MaxValue="0.078" 
+                                        XAxisUnit="Minute" 
+                                        XAxisUnitCount="1" 
+                                        XAxisUnitStringFormat="HH:mm:ss"
+                                        YAxisUnitStringFormat="N5"
+                                        GridLineColor="#19383838" 
+        >
+                <linechart:LiveChartControl.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Transparent" Offset="0"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </linechart:LiveChartControl.Background>
+                <linechart:LiveChartControl.ChunkColor>
+                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                        <GradientStop Color="#19FFFFFF" Offset="1"/>
+                        <GradientStop Color="#19FFDC90"/>
+                    </LinearGradientBrush>
+                </linechart:LiveChartControl.ChunkColor>
+            </linechart:LiveChartControl>
+        </Grid>
+    </Grid>
+</Page>
