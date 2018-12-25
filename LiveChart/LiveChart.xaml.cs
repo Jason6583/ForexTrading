@@ -92,6 +92,20 @@ namespace LiveChart
         private static readonly DependencyProperty XAxisUnitStringFormatProperty =
             DependencyProperty.Register("XAxisUnitStringFormatProperty", typeof(string), typeof(LiveChartControl));
 
+        /// <summary>
+        /// Property for maximum visible count of data
+        /// </summary>
+        public int DataCount
+        {
+            get { return (int)this.GetValue(DataCountProperty); }
+            set { this.SetValue(DataCountProperty, value); }
+        }
+
+        private static readonly DependencyProperty DataCountProperty =
+            DependencyProperty.Register("DataCountProperty", typeof(int), typeof(LiveChartControl),
+                new PropertyMetadata(20));
+
+
         public string XAxisUnitStringFormat
         {
             get { return (string)this.GetValue(XAxisUnitStringFormatProperty); }
@@ -183,7 +197,7 @@ namespace LiveChart
             InitializeComponent();
 
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
-            Console.WriteLine((RenderCapability.Tier >> 16));
+
             LineColor = Brushes.White;
             ChunkColor = Brushes.Wheat;
             AxisColor = Brushes.Black;
@@ -204,7 +218,16 @@ namespace LiveChart
             CanvasMain.Children.Add(_mainLine);
         }
 
+        private void Load()
+        {
+            foreach (KeyValuePair<DateTime, double> item in DataSource)
+            {
+                AddValueWithoutAnimation(item);
+                akutalnyIndex++;
+            }
 
+            jeMoznePridat = true;
+        }
         private void DataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (KeyValuePair<DateTime, double> item in e.NewItems)
@@ -219,11 +242,14 @@ namespace LiveChart
                     if (_durationOfAnimations.TimeSpan.TotalMilliseconds == 0)
                     {
                         jeMoznePridat = true;
-                        akutalnyIndex += Convert.ToInt32(Math.Ceiling((Convert.ToDouble(_maxLineCount) / _realMax)));
+                        akutalnyIndex += Convert.ToInt32(Math.Ceiling(
+                            (Convert.ToDouble(Convert.ToDouble(DataCount)) /
+                             Convert.ToDouble(Convert.ToDouble(DataCount)))));
                     }
                 }
             }
         }
+
 
         private void CreateAddAnimationForLine(Point newPoint)
         {
@@ -248,7 +274,7 @@ namespace LiveChart
                 AddValue(DataSource[Convert.ToInt32(akutalnyIndex)]);
 
                 ActualValueText.Text = $"{DataSource[Convert.ToInt32(akutalnyIndex)].Value}";
-                akutalnyIndex += Convert.ToInt32(Math.Ceiling((Convert.ToDouble(_maxLineCount) / _realMax)));
+                akutalnyIndex += Convert.ToInt32(Math.Ceiling((Convert.ToDouble(Convert.ToDouble(DataCount)) / Convert.ToDouble(Convert.ToDouble(DataCount)))));
 
                 if (akutalnyIndex + 1 == DataSource.Count)
                     jeMoznePridat = true;
@@ -281,52 +307,36 @@ namespace LiveChart
 
         }
 
-        private void ShiftXVisibleField(double value)
-        {
-            TranslateTransform shiftRenderTransform = new TranslateTransform();
-            DoubleAnimation shiftAnimation = new DoubleAnimation(lastVisibleXValue,
-                lastVisibleXValue - value, _durationOfAnimations);
 
-            shiftAnimation.Completed += ShiftAnimation_Completed;
-
-            nextFistVisibleValue = firstVisibleXValue;
-            lastVisibleXValue -= value;
-            shiftRenderTransform.BeginAnimation(TranslateTransform.XProperty, shiftAnimation);
-
-            _mainLine.RenderTransform = shiftRenderTransform;
-
-        }
-
-        //List of new points when Y shifts
-        private List<Point> points;
+        //List of new pointsY when Y shifts
+        private List<Point> pointsY;
         private void ShiftYVisibleField(double value)
         {
-            points = new List<Point>();
+            pointsY = new List<Point>();
             PointAnimation shiftYAnimationS = new PointAnimation(new Point(_pathFigureOfMainLine.StartPoint.X, _bottomOfChart)
                 , _durationOfAnimations);
             _pathFigureOfMainLine.BeginAnimation(PathFigure.StartPointProperty, shiftYAnimationS);
 
-            i = 0;
             foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)
             {
                 PointAnimation shiftYAnimation = new PointAnimation(new Point(lineSegment.Point.X, lineSegment.Point.Y + value)
                     , _durationOfAnimations);
 
-                points.Add(new Point(lineSegment.Point.X, lineSegment.Point.Y + value));
+                pointsY.Add(new Point(lineSegment.Point.X, lineSegment.Point.Y + value));
 
                 shiftYAnimation.Completed += ShiftYAnimation_Completed;
                 lineSegment.BeginAnimation(LineSegment.PointProperty, shiftYAnimation);
-                i++;
             }
-
-            i = 0;
         }
 
         private void ShiftYAnimation_Completed(object sender, EventArgs e)
         {
-            ((LineSegment)_pathFigureOfMainLine.Segments[i]).BeginAnimation(LineSegment.PointProperty, null);
-            ((LineSegment)_pathFigureOfMainLine.Segments[i]).Point = points[i];
-            i++;
+
+            for (int i = 0; i < pointsY.Count; i++)
+            {
+                _pathFigureOfMainLine.Segments[i].BeginAnimation(LineSegment.PointProperty, null);
+                ((LineSegment)_pathFigureOfMainLine.Segments[i]).Point = pointsY[i];
+            }
         }
 
         private double lastVisibleXValue;
@@ -366,22 +376,22 @@ namespace LiveChart
             switch (XAxisUnit)
             {
                 case XAxisValue.Second:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(Convert.ToDouble(DataCount)));
                     break;
                 case XAxisValue.Minute:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(DataCount));
                     break;
                 case XAxisValue.Hour:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(DataCount));
                     break;
                 case XAxisValue.Day:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(DataCount));
                     break;
                 case XAxisValue.Month:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(DataCount));
                     break;
                 case XAxisValue.Year:
-                    _lastTime = _firstTime.AddSeconds(_realMax);
+                    _lastTime = _firstTime.AddSeconds(Convert.ToDouble(DataCount));
                     break;
             }
         }
@@ -391,16 +401,16 @@ namespace LiveChart
             switch (XAxisUnit)
             {
                 case XAxisValue.Second:
-                    _firstTime = _lastTime.AddSeconds(-_realMax * 0.8);
+                    _firstTime = _lastTime.AddSeconds(-Convert.ToDouble(DataCount) * 0.8);
                     break;
                 case XAxisValue.Minute:
-                    _firstTime = _lastTime.AddMinutes(-_realMax * 0.8);
+                    _firstTime = _lastTime.AddMinutes(-Convert.ToDouble(DataCount) * 0.8);
                     break;
                 case XAxisValue.Hour:
-                    _firstTime = _lastTime.AddHours(-_realMax * 0.8);
+                    _firstTime = _lastTime.AddHours(-Convert.ToDouble(DataCount) * 0.8);
                     break;
                 case XAxisValue.Day:
-                    _firstTime = _lastTime.AddDays(-_realMax * 0.8);
+                    _firstTime = _lastTime.AddDays(-Convert.ToDouble(DataCount) * 0.8);
                     break;
                 case XAxisValue.Month:
                     _firstTime = _lastTime.AddMonths(1);
@@ -526,11 +536,148 @@ namespace LiveChart
             _lastData = data;
         }
 
-        private void ShiftAnimation_Completed(object sender, EventArgs e)
+        public void AddValueWithoutAnimation(KeyValuePair<DateTime, double> data)
+        {
+            //Resize();
+            double diffrence = data.Value - _minValue;
+            double valueForCanvas = ((_top * diffrence) / _range);
+
+            if (_pathFigureOfMainLine.Segments.Count == 0)
+            {
+                _pathFigureOfMainLine.StartPoint = new Point(0, _bottomOfChart);
+                _lastPoint = new Point(0, _bottomOfChart);
+
+                _firstTime = DataSource[0].Key;
+                SetLastTime();
+
+                MakeGridBackgroud(XAxisUnit);
+                UpdateLayout();
+                SetGridBackground();
+            }
+
+            if (_pathFigureOfMainLine.Segments.Count > 0)
+            {
+                _pathFigureOfMainLine.Segments.Remove(_pathFigureOfMainLine.Segments[_indexOfLastFigure]);
+            }
+
+            double newXValue = 0;
+            if (_lastData.Key != DateTime.MaxValue)
+            {
+                _actualShift = GetValueOfShift(data);
+                newXValue = _xValue + _actualShift;
+                nextFistVisibleValue = firstVisibleXValue + _actualShift;
+            }
+
+            if (data.Value > _maxValue)
+            {
+                double diff = data.Value - _maxValue;
+                double perc = _top / _range;
+                double valueF = (perc * diff);
+
+                ShiftYVisibleField(valueF);
+
+                _minValue += data.Value - _maxValue;
+                _maxValue = data.Value;
+
+                CountLables();
+
+                diffrence = data.Value - _minValue;
+                valueForCanvas = ((_top * diffrence) / _range);
+
+            }
+            else if (_minValue > data.Value)
+            {
+                double diff = data.Value - _minValue;
+                double perc = _top / _range;
+                double valueF = (perc * diff);
+                ShiftYVisibleField(valueF);
+
+                _maxValue += data.Value - _minValue;
+                _minValue = data.Value;
+
+                CountLables();
+
+                diffrence = data.Value - _minValue;
+                valueForCanvas = ((_top * diffrence) / _range);
+
+            }
+
+            //If is end of max rendering view
+            if (_xValue > _maxRenderingPoint - _actualShift)
+            {
+                //Shift all visible linesHorizontal and bodies to left     
+
+                _lastTime = data.Key;
+                SetFirstTime();
+
+                CountLables(XAxisUnit);
+
+                ShiftXVisibleField(_actualShift);
+                if (!edge)
+                {
+                    newXValue = _maxRenderingPoint + _actualShift;
+                    nextFistVisibleValue = _maxRenderingPoint;
+                    edge = true;
+                }
+                else
+                {
+                    newXValue = _lastPoint.X + _actualShift;
+                }
+            }
+
+            if (_pathFigureOfMainLine.Segments.Count == 0)
+            {
+                _newPoint = new Point(0, _bottom - valueForCanvas);
+                _pathFigureOfMainLine.Segments.Add(new LineSegment(_lastPoint, false));
+                _pathFigureOfMainLine.Segments.Add(new LineSegment(new Point(0, _bottomOfChart), false));
+                nextFistVisibleValue = 0;
+            }
+            else
+            {
+                _newPoint = new Point(newXValue, _bottom - valueForCanvas);
+                _pathFigureOfMainLine.Segments.Add(new LineSegment(_lastPoint, true));
+                _pathFigureOfMainLine.Segments.Add(new LineSegment(new Point(_lastPoint.X, _bottomOfChart), false));
+            }
+
+            newXValue += _shift;
+
+            firstVisibleXValue = nextFistVisibleValue;
+
+            _xValue = newXValue;
+
+            _indexOfLastFigure++;
+            _lastPoint = _newPoint;
+            _lastData = data;
+        }
+
+        private List<Point> pointsX;
+        private void ShiftXVisibleField(double value)
+        {
+            pointsX = new List<Point>();
+
+            TranslateTransform shiftRenderTransform = new TranslateTransform();
+            DoubleAnimation shiftAnimation = new DoubleAnimation(lastVisibleXValue,
+                lastVisibleXValue - value, _durationOfAnimations);
+
+            foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)
+            {
+                pointsX.Add(new Point(lineSegment.Point.X, lineSegment.Point.Y));
+            }
+
+            shiftAnimation.Completed += ShiftXAnimation_Completed;
+
+            nextFistVisibleValue = firstVisibleXValue;
+            lastVisibleXValue -= value;
+            shiftRenderTransform.BeginAnimation(TranslateTransform.XProperty, shiftAnimation);
+
+            _mainLine.RenderTransform = shiftRenderTransform;
+
+        }
+        private void ShiftXAnimation_Completed(object sender, EventArgs e)
         {
             //Delete segments out of visible field
             //Dont delete frist one
-            if (_xValue / _shift > _realMax + 2)
+            if (_maxRenderingPoint / _shift > Convert.ToDouble(DataCount) + 2)
             {
                 _pathFigureOfMainLine.StartPoint = new Point(((LineSegment)_pathFigureOfMainLine.Segments[0]).Point.X, _bottomOfChart);
                 _pathFigureOfMainLine.Segments.Remove(_pathFigureOfMainLine.Segments[0]);
@@ -579,8 +726,6 @@ namespace LiveChart
             }
         }
 
-        private int _maxLineCount = 200;
-        private int _realMax = 200;
 
         private double _maxValue;
         private double _minValue;
@@ -607,7 +752,7 @@ namespace LiveChart
             switch (msg)
             {
                 case WmExitSizeMove:
-                    Resize(null,null);
+                    Resize(null, null);
                     jeMoznePridat = true;
                     handled = true;
                     break;
@@ -628,7 +773,8 @@ namespace LiveChart
                     source.AddHook(HwndMessageHook);
             }
 
-            _shift = ActualWidth / _realMax;
+            _shift = ActualWidth / Convert.ToDouble(DataCount);
+
 
             _minValue = MinValue;
             _maxValue = MaxValue;
@@ -644,7 +790,7 @@ namespace LiveChart
             _top = ActualHeight * 0.6;
             _range = _maxValue - _minValue;
 
-            _maxRenderingPoint = (_shift * _realMax) * 0.8;
+            _maxRenderingPoint = (_shift * Convert.ToDouble(DataCount)) * 0.8;
 
             _lastHeight = ActualHeight;
             _lastWidth = ActualWidth;
@@ -703,18 +849,6 @@ namespace LiveChart
             _mainLine.Stroke = LineColor;
             _mainLine.Fill = ChunkColor;
 
-
-            //_mainLine.Effect = new DropShadowEffect
-            //{
-            //    Color = ((SolidColorBrush)LineColor).Color,
-            //    Direction = 45,
-            //    ShadowDepth = 0,
-            //    Opacity = 0.5,
-            //    BlurRadius = 5
-            //};
-
-            //GridBackground
-            DataSource.CollectionChanged += DataSource_CollectionChanged;
             Border_YAxisLegend.Height = CanvasMain.ActualHeight;
 
             _gridBackground = new GridBackground();
@@ -725,6 +859,14 @@ namespace LiveChart
             Label_MinY.Visibility = Visibility.Hidden;
             Label_MaxX.Visibility = Visibility.Hidden;
             Label_MinX.Visibility = Visibility.Hidden;
+
+
+            DataSource.CollectionChanged += DataSource_CollectionChanged;
+
+            if (DataSource.Count != 0)
+            {
+                Load();
+            }
         }
 
         //Size remain same after state update
@@ -744,7 +886,7 @@ namespace LiveChart
                 Resize(widthBeforeStateChanged, heightBeforeStateChanged);
             }
 
-          
+
             jeMoznePridat = true;
         }
 
@@ -754,7 +896,7 @@ namespace LiveChart
         {
             //Vertical lines
             double valueOfSpreadVertical = ActualWidth / _lineCountVertical;
-            double valueOfOneLineLabel = (_realMax / _lineCountVertical);
+            double valueOfOneLineLabel = (Convert.ToDouble(DataCount) / _lineCountVertical);
 
             double valueOfFontSize = (ActualWidth / _lineCountVertical) / 7;
             for (int i = 0; i < _lineCountVertical * 1.2; i++)
@@ -880,7 +1022,7 @@ namespace LiveChart
 
         public void CountLables(XAxisValue xAxisValue)
         {
-            double valueOfOneLineLabel = (_realMax / _lineCountVertical);
+            double valueOfOneLineLabel = (Convert.ToDouble(DataCount) / _lineCountVertical);
             i = 0;
             foreach (Label label in _gridBackground.labelsVertical)
             {
@@ -931,17 +1073,26 @@ namespace LiveChart
             if (diffrenceWidth != 1 || diffrenceHeight != 1)
             {
                 jeMoznePridat = false;
+                _maxRenderingPoint = (_shift * Convert.ToDouble(DataCount)) * 0.8;
+
                 //Line
                 foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)
                 {
+
                     var x = lineSegment.Point.X * diffrenceWidth;
                     var y = lineSegment.Point.Y * diffrenceHeight;
 
+                    lineSegment.BeginAnimation(LineSegment.PointProperty, null);
                     lineSegment.Point = new Point(x, y);
+
+
                 }
 
+                if (edge)
+                    ShiftXVisibleField(_shift);
                 //Body
-                _shift = width1 / _realMax;
+
+                _shift = width1 / Convert.ToDouble(DataCount);
                 _bottomOfChart = height1;
                 _xValue = _xValue * diffrenceWidth;
 
@@ -953,17 +1104,14 @@ namespace LiveChart
                 _top = height1 * 0.6;
                 _range = _maxValue - _minValue;
 
-                _maxRenderingPoint = (_shift * _realMax) * 0.8;
-
                 _pathFigureOfMainLine.BeginAnimation(PathFigure.StartPointProperty, null);
                 _pathFigureOfMainLine.StartPoint = new Point(0, _bottomOfChart);
 
                 _lastHeight = height1;
                 _lastWidth = width1;
+
                 lastVisibleXValue = lastVisibleXValue * diffrenceWidth;
-
                 firstVisibleXValue = firstVisibleXValue * diffrenceWidth;
-
 
                 //GridBackground
                 Border_YAxisLegend.Height = CanvasMain.ActualHeight;

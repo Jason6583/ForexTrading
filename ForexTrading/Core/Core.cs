@@ -59,9 +59,11 @@ namespace ForexTrading.Core
             var client = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
             _tradingServiceClient = client.CreateChannel();
             LoginUser("pecho4@gmail.com", "1111");
+        }
 
-
-
+        public ForexData GetData(int count, DateTime time)
+        {
+            return _tradingServiceClient.GetData(count, time);
         }
 
         /// <summary>

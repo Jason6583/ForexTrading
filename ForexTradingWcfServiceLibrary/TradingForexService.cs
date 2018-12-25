@@ -56,16 +56,35 @@ namespace ForexTradingWcfServiceLibrary
             Console.WriteLine("");
         }
 
+        public ForexData GetData(int count, DateTime time)
+        {
+            var data = (from x in _forexTradingContext.TraidingPairDatas
+                        let value = x.TradingPair.FirstAsset.Name + x.TradingPair.SecondAsset.Name
+                        where x.Date <= time
+                        where x.TradingPair.FirstAsset.Name + "/" + x.TradingPair.SecondAsset.Name == "EUR/USD"
+                        group x.Value by value
+                into y
+                        select y);
+
+            var convertedData = ConvertData(data);
+            return convertedData;
+        }
+
         private ForexData ConvertData(IEnumerable<IGrouping<string, double>> data)
         {
+            
+
             if (data.Count() != 0)
             {
-                List<KeyValuePair<DateTime,double>> listOfData = new List<KeyValuePair<DateTime, double>>();
+                var pom = data.First();
+                var pom1 = pom.Reverse().Take(80);
+
+                List<KeyValuePair<DateTime, double>> listOfData = new List<KeyValuePair<DateTime, double>>();
                 ForexData forexData = new ForexData(data.First().Key, listOfData);
 
-                foreach (var pomData in data.First())
+                foreach (var pomData in pom1)
                 {
-                    listOfData.Add(new KeyValuePair<DateTime, double>(_serverTime,pomData));
+                    listOfData.Add(new KeyValuePair<DateTime, double>(_serverTime, pomData));
                 }
 
                 return forexData;
@@ -74,17 +93,18 @@ namespace ForexTradingWcfServiceLibrary
             return null;
         }
 
+
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             try
             {
                 var data = (from x in _forexTradingContext.TraidingPairDatas
-                    let value = x.TradingPair.FirstAsset.Name + x.TradingPair.SecondAsset.Name
-                    where x.Date == _serverTime
-                    where x.TradingPair.FirstAsset.Name + "/" + x.TradingPair.SecondAsset.Name == "EUR/USD"
-                    group x.Value by value
+                            let value = x.TradingPair.FirstAsset.Name + x.TradingPair.SecondAsset.Name
+                            where x.Date == _serverTime
+                            where x.TradingPair.FirstAsset.Name + "/" + x.TradingPair.SecondAsset.Name == "EUR/USD"
+                            group x.Value by value
                     into y
-                    select y);
+                            select y);
 
 
                 var convertedData = ConvertData(data);
@@ -94,9 +114,9 @@ namespace ForexTradingWcfServiceLibrary
 
                 _serverTime = _serverTime.AddMinutes(1);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
             }
         }
     }

@@ -30,6 +30,7 @@ namespace ForexTrading.Pages
         MainWindow _mainWindow;
         ObservableCollection<KeyValuePair<DateTime, double>> _eurUsd;
 
+        int _dataCount;
         //Initializing menu pages
         private TotalPortfolio_Page _totalPortfolio_Page;
 
@@ -45,14 +46,27 @@ namespace ForexTrading.Pages
             }
         }
 
+        public int DataCount
+        {
+            get { return _dataCount; }
+            set
+            {
+                _dataCount = value;
+                EurUsdChart.DataCount = 5;
+            }
+        }
+
         public ForexPage(MainWindow mainWindow)
         {
             InitializeComponent();
             DataContext = this;
+            DataCount = 10;
 
             //Intializing datasources for chart
-            EurUsD = new ObservableCollection<KeyValuePair<DateTime, double>>();
             _mainWindow = mainWindow;
+
+            var data = _mainWindow.Core.GetData(DataCount, new DateTime(2017, 1, 3, 2, 1, 0));
+            EurUsD = new ObservableCollection<KeyValuePair<DateTime, double>>();
 
             _totalPortfolio_Page = new TotalPortfolio_Page();
             LoadTradingPairs();
@@ -160,7 +174,7 @@ namespace ForexTrading.Pages
                 Style = this.FindResource("MenuTextBlockStyle") as Style,
                 Text = text,
                 FontSize = 15,
-                
+
             };
 
             textBlock.MouseLeftButtonDown += TextBlock_MouseLeftButtonDown;
@@ -178,6 +192,15 @@ namespace ForexTrading.Pages
         private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var a = ((TextBlock)sender).Text;
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+          
+        }
+        private void EurUsdChart_Loaded(object sender, RoutedEventArgs e)
+        {
+           
         }
     }
 }

@@ -7,7 +7,8 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="950"
       Title="ForexPage"
-      xmlns:linechart="clr-namespace:LiveChart;assembly=LiveChart"
+      xmlns:linechart="clr-namespace:LiveChart;assembly=LiveChart" Loaded="Page_Loaded"
+      
       >
 
     <Grid>
@@ -86,13 +87,13 @@
             <Frame x:Name="Frame_Menu" Grid.Column="1"/>
 
             <linechart:LiveChartControl Grid.Column="2" 
-                                        x:Name="Chart" 
+                                        x:Name="EurUsdChart" 
                                         LineColor="#FFFFA728" 
                                         DotColor="#FFFFF97A" 
                                         DataSource="{Binding EurUsD}" 
                                         Foreground="#FFFFAF3B" 
                                         FontSize="15" 
-                                        AxisColor="#18FFA728" Margin="0" 
+                                        AxisColor="#18FFA728"
                                         MinValue="0.075" 
                                         MaxValue="0.078" 
                                         XAxisUnit="Minute" 
@@ -100,6 +101,8 @@
                                         XAxisUnitStringFormat="HH:mm:ss"
                                         YAxisUnitStringFormat="N5"
                                         GridLineColor="#19383838" 
+                                        Margin="15" 
+                                        
         >
                 <linechart:LiveChartControl.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

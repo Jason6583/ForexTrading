@@ -16,6 +16,8 @@ namespace ForexTradingWcfServiceLibrary
         bool RegisterUser(string name, string surename,string email, string password);
         [OperationContract]
         void SelectTradingPair(string name);
+        [OperationContract]
+        ForexData GetData(int count, DateTime time);
     }
 
     [DataContract]
