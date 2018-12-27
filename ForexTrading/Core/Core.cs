@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ForexTradingWcfServiceLibrary;
 
@@ -15,7 +16,7 @@ namespace ForexTrading.Core
     {
         public class ReceiveDataArgs : EventArgs
         {
-            public ReceiveDataArgs(string name, List<KeyValuePair<DateTime,double>> data)
+            public ReceiveDataArgs(string name, List<KeyValuePair<DateTime, double>> data)
             {
                 Data = data;
                 Name = name;
@@ -29,7 +30,13 @@ namespace ForexTrading.Core
         public event UpdateFileEventHandler ReceiveDataEvent;
         public void ReceiveData(ForexData data)
         {
-            OnReceiveDataEvent(this, new ReceiveDataArgs(data.Name, data.Data));
+            List<KeyValuePair<DateTime, double>> list = new List<KeyValuePair<DateTime, double>>();
+            foreach (var item in data.Data)
+            {
+                list.Add(new KeyValuePair<DateTime, double>(new DateTime(item.Key, DateTimeKind.Utc), item.Value));
+            }
+
+            OnReceiveDataEvent(this, new ReceiveDataArgs(data.Name, list));
         }
 
         protected virtual void OnReceiveDataEvent(object source, ReceiveDataArgs args)
@@ -42,28 +49,55 @@ namespace ForexTrading.Core
     /// </summary>
     public class Core
     {
+        public string UserEmail { get; set; }
         private static Client _client;
         public Client Client
         {
             get { return _client; }
-            
+
         }
 
-        private InstanceContext instanceContext;
+        private static InstanceContext instanceContext;
         private ITradingForexService _tradingServiceClient;
         public Core()
         {
             _client = new Client();
             instanceContext = new InstanceContext(_client);
-            
-            var client = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
-            _tradingServiceClient = client.CreateChannel();
-            LoginUser("pecho4@gmail.com", "1111");
+
+            CreateConnection();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(
+                (obj) =>
+                {
+                    _tradingServiceClient = proxy.CreateChannel();
+                }));
+
+        }
+        private static DuplexChannelFactory<ITradingForexService> proxy;
+        public void CreateConnection()
+        {
+            proxy = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
         }
 
-        public ForexData GetData(int count, DateTime time)
+        public void CloseConnection()
         {
-            return _tradingServiceClient.GetData(count, time);
+            proxy.Close();
+            instanceContext = null;
+        }
+
+        public List<KeyValuePair<DateTime, double>> GetData(int count, string tradingPair)
+        {
+            CreateConnection();
+
+            ForexData forexData = _tradingServiceClient.GetData(count, tradingPair);
+            List<KeyValuePair<DateTime, double>> list = new List<KeyValuePair<DateTime, double>>();
+            foreach (var item in forexData.Data)
+            {
+                list.Add(new KeyValuePair<DateTime, double>(new DateTime(item.Key, DateTimeKind.Utc), item.Value));
+            }
+
+            proxy.Close();
+            return list;
+
         }
 
         /// <summary>
@@ -73,8 +107,14 @@ namespace ForexTrading.Core
         /// <param name="password"></param>
         public void LoginUser(string email, string password)
         {
-            _tradingServiceClient.LoginUser("pecho4@gmail.com", "1111");
+            CreateConnection();
+            if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+            {
+                UserEmail = email;
+            }
+            proxy.Close();
         }
+
 
         /// <summary>
         /// Register user to database
@@ -95,9 +135,46 @@ namespace ForexTrading.Core
             }
         }
 
-        //public List<TradingPair> GetAllTradingPairs()
-        //{
-        //   return _database.GetAllTradingPairs();
-        //}
+        public List<string> GetAllTradingPairs()
+        {
+            CreateConnection();
+            List<string> foo = _tradingServiceClient.GetAllTradingPairs();
+            proxy.Close();
+            return foo;
+        }
+
+        public void AddAsset(string tradingPair, DateTime timeOfBuy)
+        {
+            CreateConnection();
+            _tradingServiceClient.AddAsset(tradingPair, timeOfBuy.Ticks);
+            instanceContext.Close();
+        }
+
+        public DateTime GetServerTime()
+        {
+            CreateConnection();
+            DateTime dateTime = new DateTime(_tradingServiceClient.GetServerTime(), DateTimeKind.Utc);
+            proxy.Close();
+            return dateTime;
+
+        }
+
+        public List<string[]> GetPortFolio()
+        {
+            CreateConnection();
+            List<string[]> foo = _tradingServiceClient.GetPortFolio();
+            proxy.Close();
+
+            return foo;
+        }
+
+        public double GetActualValue(string firstAssetName, string secondAssetName)
+        {
+            CreateConnection();
+            var foo = _tradingServiceClient.GetActualValue(firstAssetName, secondAssetName);
+            proxy.Close();
+            return foo;
+
+        }
     }
 }

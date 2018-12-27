@@ -49,6 +49,7 @@ namespace LiveChart
         Month,
         Year
     }
+
     /// <summary>
     /// Interaction logic for LiveChartControl.xaml
     /// </summary>
@@ -65,14 +66,14 @@ namespace LiveChart
         private Path _mainLine;
         private PathFigure _pathFigureOfMainLine;
 
-        private bool jeMoznePridat;
         private int _indexOfLastFigure;
-        private double _scale = 10000;
-        private double akutalnyIndex;
+
+        #region Dependency properties
 
         private static readonly DependencyProperty DataSourceProperty =
-                DependencyProperty.Register("DataSource", typeof(ObservableCollection<KeyValuePair<DateTime, double>>), typeof(LiveChartControl),
-                    new PropertyMetadata(default(ObservableCollection<KeyValuePair<DateTime, double>>)));
+            DependencyProperty.Register("DataSource", typeof(ObservableCollection<KeyValuePair<DateTime, double>>),
+                typeof(LiveChartControl),
+                new PropertyMetadata(default(ObservableCollection<KeyValuePair<DateTime, double>>)));
 
         public ObservableCollection<KeyValuePair<DateTime, double>> DataSource
         {
@@ -150,6 +151,7 @@ namespace LiveChart
 
         private static readonly DependencyProperty MinValueProperty =
             DependencyProperty.Register("MinValueProperty", typeof(double), typeof(LiveChartControl));
+
         public double MinValue
         {
             get { return (double)this.GetValue(MinValueProperty); }
@@ -158,6 +160,7 @@ namespace LiveChart
 
         private static readonly DependencyProperty MaxValueProperty =
             DependencyProperty.Register("MaxValueProperty", typeof(double), typeof(LiveChartControl));
+
         public double MaxValue
         {
             get { return (double)this.GetValue(MaxValueProperty); }
@@ -191,6 +194,7 @@ namespace LiveChart
             set { this.SetValue(ChunkColorProperty, value); }
         }
 
+        #endregion
 
         public LiveChartControl()
         {
@@ -218,38 +222,77 @@ namespace LiveChart
             CanvasMain.Children.Add(_mainLine);
         }
 
-        private void Load()
+        public void Clear()
         {
-            foreach (KeyValuePair<DateTime, double> item in DataSource)
+            //Dequeue thread and may happend changed collection
+            List<Thread> pom = threads.ToList();
+            for (int i = 0; i < pom.Count; i++)
             {
-                AddValueWithoutAnimation(item);
-                akutalnyIndex++;
-            }
-
-            jeMoznePridat = true;
-        }
-        private void DataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            foreach (KeyValuePair<DateTime, double> item in e.NewItems)
-            {
-                if (jeMoznePridat || DataSource.Count == 1)
+                if (pom[i] != null)
                 {
-                    AddValue(item);
-                    akutalnyIndex++;
-                    ActualValueText.Text = $"{item.Value}";
-
-                    jeMoznePridat = false;
-                    if (_durationOfAnimations.TimeSpan.TotalMilliseconds == 0)
-                    {
-                        jeMoznePridat = true;
-                        akutalnyIndex += Convert.ToInt32(Math.Ceiling(
-                            (Convert.ToDouble(Convert.ToDouble(DataCount)) /
-                             Convert.ToDouble(Convert.ToDouble(DataCount)))));
-                    }
+                    pom[i].Abort();
                 }
             }
+
+            threads.Clear();
+
+            CanvasMain.Children.Clear();
+            _xValue = 0;
+            nextFistVisibleValue = 0;
+            firstVisibleXValue = 0;
+            _indexOfLastFigure = 0;
+            lastVisibleXValue = 0;
+            _mainLine = new Path();
+            _lastData = new KeyValuePair<DateTime, double>(DateTime.MaxValue, 0);
+            _lastPoint = new Point(0, 0);
+
+            var pathGeometryOfMainLine = new PathGeometry();
+            _pathFigureOfMainLine = new PathFigure();
+            pathGeometryOfMainLine.Figures.Add(_pathFigureOfMainLine);
+            _mainLine.Data = pathGeometryOfMainLine;
+
+            CanvasMain.Children.Add(Dot);
+            CanvasMain.Children.Add(ActualValueText);
+            CanvasMain.Children.Add(_mainLine);
+            Grid_XAxisScale.Children.Clear();
+            Grid_YAxisScale.Children.Clear();
+
+            Init();
         }
 
+        public void Load(ObservableCollection<KeyValuePair<DateTime, double>> collection)
+        {
+            foreach (KeyValuePair<DateTime, double> item in collection)
+            {
+                AddValueWithoutAnimation(item);
+            }
+        }
+
+        private Queue<Thread> threads = new Queue<Thread>();
+        private volatile Semaphore semaphore = new Semaphore(1, 10);
+        private DateTime lastValue = new DateTime();
+
+        private void DataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (lastValue != ((KeyValuePair<DateTime, double>)e.NewItems[0]).Key)
+            {
+                Thread thread = new Thread(() =>
+                {
+                    foreach (KeyValuePair<DateTime, double> item in e.NewItems)
+                    {
+                        semaphore.WaitOne();
+                        Dispatcher.Invoke(() =>
+                        {
+                            AddValue(item);
+                            ActualValueText.Text = $"{item.Value}";
+                        });
+                    }
+                });
+                thread.Start();
+                threads.Enqueue(thread);
+            }
+            lastValue = ((KeyValuePair<DateTime, double>)e.NewItems[0]).Key;
+        }
 
         private void CreateAddAnimationForLine(Point newPoint)
         {
@@ -266,25 +309,9 @@ namespace LiveChart
 
         private void AddLineAnimation_Completed(object sender, EventArgs e)
         {
-            _pathFigureOfMainLine.Segments[_indexOfLastFigure - 1].BeginAnimation(LineSegment.PointProperty, null);
-            ((LineSegment)_pathFigureOfMainLine.Segments[_indexOfLastFigure - 1]).Point = new Point(_lastPoint.X, _lastPoint.Y);
-
-            if (DataSource.Count > akutalnyIndex)
-            {
-                AddValue(DataSource[Convert.ToInt32(akutalnyIndex)]);
-
-                ActualValueText.Text = $"{DataSource[Convert.ToInt32(akutalnyIndex)].Value}";
-                akutalnyIndex += Convert.ToInt32(Math.Ceiling((Convert.ToDouble(Convert.ToDouble(DataCount)) / Convert.ToDouble(Convert.ToDouble(DataCount)))));
-
-                if (akutalnyIndex + 1 == DataSource.Count)
-                    jeMoznePridat = true;
-                else
-                    jeMoznePridat = false;
-            }
-            else
-            {
-                jeMoznePridat = true;
-            }
+            semaphore.Release();
+            if (threads.Count > 0)
+                threads.Dequeue();
         }
 
         private void CreateAnimationForShiftDotAndText(double value)
@@ -293,7 +320,7 @@ namespace LiveChart
 
             DoubleAnimation anim2 = null;
             DoubleAnimation anim1 = new DoubleAnimation(firstVisibleXValue - (Dot.Width / 2),
-                    nextFistVisibleValue - (Dot.Width / 2), _durationOfAnimations);
+                nextFistVisibleValue - (Dot.Width / 2), _durationOfAnimations);
 
             anim2 = new DoubleAnimation(_lastPoint.Y - (Dot.Width / 2),
                 (_bottom) - Convert.ToDouble(value) - (Dot.Width / 2), _durationOfAnimations);
@@ -307,6 +334,27 @@ namespace LiveChart
 
         }
 
+        private void ShiftDotAndTextWithoutAnimation(double value)
+        {
+            TranslateTransform trans = new TranslateTransform();
+
+            DoubleAnimation anim2 = null;
+            DoubleAnimation anim1 = new DoubleAnimation(0 - (Dot.Width / 2),
+                nextFistVisibleValue - (Dot.Width / 2), new TimeSpan(0, 0, 0));
+
+            anim2 = new DoubleAnimation(_lastPoint.Y - (Dot.Width / 2),
+                (_bottom) - Convert.ToDouble(value) - (Dot.Width / 2), new TimeSpan(0, 0, 0));
+
+            trans.BeginAnimation(TranslateTransform.XProperty, anim1);
+            trans.BeginAnimation(TranslateTransform.YProperty, anim2);
+
+            Dot.RenderTransform = trans;
+            ActualValueText.RenderTransform = trans;
+
+
+            //firstVisibleXValue = _xValue;
+            //nextFistVisibleValue = _xValue + _shift;
+        }
 
         //List of new pointsY when Y shifts
         private List<Point> pointsY;
@@ -329,19 +377,34 @@ namespace LiveChart
             }
         }
 
-        private void ShiftYAnimation_Completed(object sender, EventArgs e)
+        private void ShiftYVisibleFieldWithoutAnimation(double value)
         {
 
+            foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)
+            {
+
+                lineSegment.Point = new Point(lineSegment.Point.X, lineSegment.Point.Y + value);
+            }
+        }
+
+        private void ShiftYAnimation_Completed(object sender, EventArgs e)
+        {
             for (int i = 0; i < pointsY.Count; i++)
             {
-                _pathFigureOfMainLine.Segments[i].BeginAnimation(LineSegment.PointProperty, null);
-                ((LineSegment)_pathFigureOfMainLine.Segments[i]).Point = pointsY[i];
+                if (_pathFigureOfMainLine.Segments.Count > 0)
+                {
+                    _pathFigureOfMainLine.Segments[i].BeginAnimation(LineSegment.PointProperty, null);
+                    ((LineSegment)_pathFigureOfMainLine.Segments[i]).Point = pointsY[i];
+                }
             }
         }
 
         private double lastVisibleXValue;
+
+        // Cannot use _xValue becouse is always increasing and after reach the edge need keep this value same
         private double firstVisibleXValue;
         private double nextFistVisibleValue;
+
         private double _top;
         private double _range;
         private Point _newPoint;
@@ -370,7 +433,6 @@ namespace LiveChart
 
             return -1;
         }
-
         private void SetLastTime()
         {
             switch (XAxisUnit)
@@ -395,7 +457,6 @@ namespace LiveChart
                     break;
             }
         }
-
         private void SetFirstTime()
         {
             switch (XAxisUnit)
@@ -423,6 +484,7 @@ namespace LiveChart
         public void AddValue(KeyValuePair<DateTime, double> data)
         {
             //Resize();
+
             double diffrence = data.Value - _minValue;
             double valueForCanvas = ((_top * diffrence) / _range);
 
@@ -534,6 +596,7 @@ namespace LiveChart
             _indexOfLastFigure++;
             _lastPoint = _newPoint;
             _lastData = data;
+
         }
 
         public void AddValueWithoutAnimation(KeyValuePair<DateTime, double> data)
@@ -547,7 +610,7 @@ namespace LiveChart
                 _pathFigureOfMainLine.StartPoint = new Point(0, _bottomOfChart);
                 _lastPoint = new Point(0, _bottomOfChart);
 
-                _firstTime = DataSource[0].Key;
+                _firstTime = data.Key;
                 SetLastTime();
 
                 MakeGridBackgroud(XAxisUnit);
@@ -574,7 +637,7 @@ namespace LiveChart
                 double perc = _top / _range;
                 double valueF = (perc * diff);
 
-                ShiftYVisibleField(valueF);
+                ShiftYVisibleFieldWithoutAnimation(valueF);
 
                 _minValue += data.Value - _maxValue;
                 _maxValue = data.Value;
@@ -590,7 +653,8 @@ namespace LiveChart
                 double diff = data.Value - _minValue;
                 double perc = _top / _range;
                 double valueF = (perc * diff);
-                ShiftYVisibleField(valueF);
+
+                ShiftYVisibleFieldWithoutAnimation(valueF);
 
                 _maxValue += data.Value - _minValue;
                 _minValue = data.Value;
@@ -639,12 +703,10 @@ namespace LiveChart
                 _pathFigureOfMainLine.Segments.Add(new LineSegment(new Point(_lastPoint.X, _bottomOfChart), false));
             }
 
-            newXValue += _shift;
+            ShiftDotAndTextWithoutAnimation(valueForCanvas);
 
             firstVisibleXValue = nextFistVisibleValue;
-
             _xValue = newXValue;
-
             _indexOfLastFigure++;
             _lastPoint = _newPoint;
             _lastData = data;
@@ -677,7 +739,7 @@ namespace LiveChart
         {
             //Delete segments out of visible field
             //Dont delete frist one
-            if (_maxRenderingPoint / _shift > Convert.ToDouble(DataCount) + 2)
+            if (_maxRenderingPoint / _shift < Convert.ToDouble(DataSource.Count) + 2)
             {
                 _pathFigureOfMainLine.StartPoint = new Point(((LineSegment)_pathFigureOfMainLine.Segments[0]).Point.X, _bottomOfChart);
                 _pathFigureOfMainLine.Segments.Remove(_pathFigureOfMainLine.Segments[0]);
@@ -726,7 +788,6 @@ namespace LiveChart
             }
         }
 
-
         private double _maxValue;
         private double _minValue;
         private double _bottomOfChart;
@@ -753,7 +814,7 @@ namespace LiveChart
             {
                 case WmExitSizeMove:
                     Resize(null, null);
-                    jeMoznePridat = true;
+                    semaphore.Release();
                     handled = true;
                     break;
             }
@@ -761,7 +822,8 @@ namespace LiveChart
         }
 
         private Window mainWindow;
-        private void LinearChartControl_Loaded(object sender, RoutedEventArgs e)
+
+        private void Init()
         {
             mainWindow = Window.GetWindow(this);
             mainWindow.StateChanged += MainWindow_StateChanged;
@@ -816,29 +878,19 @@ namespace LiveChart
             {
                 Color = ((SolidColorBrush)Foreground).Color,
                 Direction = 45,
-                ShadowDepth = 2,
-                Opacity = 0.5,
+                ShadowDepth = 1,
+                Opacity = 0.2,
                 BlurRadius = 2
             };
 
-            XAxis.Effect = new DropShadowEffect
+            _mainLine.Effect = new DropShadowEffect
             {
-                Color = ((SolidColorBrush)AxisColor).Color,
+                Color = ((SolidColorBrush)LineColor).Color,
                 Direction = 45,
                 ShadowDepth = 0,
-                Opacity = 1,
-                BlurRadius = 5
+                Opacity = 0.1,
+                BlurRadius = 1
             };
-
-            YAxis.Effect = new DropShadowEffect
-            {
-                Color = ((SolidColorBrush)AxisColor).Color,
-                Direction = 45,
-                ShadowDepth = 0,
-                Opacity = 1,
-                BlurRadius = 5
-            };
-
 
             Label_MinY.Margin = new Thickness(0, 0, 0, 0);
 
@@ -862,11 +914,11 @@ namespace LiveChart
 
 
             DataSource.CollectionChanged += DataSource_CollectionChanged;
+        }
+        private void LinearChartControl_Loaded(object sender, RoutedEventArgs e)
+        {
 
-            if (DataSource.Count != 0)
-            {
-                Load();
-            }
+            Init();
         }
 
         //Size remain same after state update
@@ -885,9 +937,6 @@ namespace LiveChart
             {
                 Resize(widthBeforeStateChanged, heightBeforeStateChanged);
             }
-
-
-            jeMoznePridat = true;
         }
 
         private double _lineCountHorizontal = 6;
@@ -901,9 +950,6 @@ namespace LiveChart
             double valueOfFontSize = (ActualWidth / _lineCountVertical) / 7;
             for (int i = 0; i < _lineCountVertical * 1.2; i++)
             {
-
-                jeMoznePridat = false;
-
                 Line line = new Line();
 
                 line.X1 = valueOfSpreadVertical * i;
@@ -963,6 +1009,7 @@ namespace LiveChart
 
         private void MakeGridBackground()
         {
+
             //Horizontal lines
             double valueOfSpreadHorizontal = (_top) / _lineCountHorizontal;
 
@@ -1059,8 +1106,6 @@ namespace LiveChart
                 i++;
             }
         }
-
-
         private void Resize(double? width, double? height)
         {
             double width1 = width ?? ActualWidth;
@@ -1069,10 +1114,10 @@ namespace LiveChart
             double diffrenceWidth = width1 / _lastWidth;
             double diffrenceHeight = height1 / _lastHeight;
 
-
             if (diffrenceWidth != 1 || diffrenceHeight != 1)
             {
-                jeMoznePridat = false;
+
+                _shift = width1 / Convert.ToDouble(DataCount);
                 _maxRenderingPoint = (_shift * Convert.ToDouble(DataCount)) * 0.8;
 
                 //Line
@@ -1085,14 +1130,18 @@ namespace LiveChart
                     lineSegment.BeginAnimation(LineSegment.PointProperty, null);
                     lineSegment.Point = new Point(x, y);
 
-
+                    if (lineSegment == _pathFigureOfMainLine.Segments.Last())
+                        ;
                 }
 
                 if (edge)
+                {
                     ShiftXVisibleField(_shift);
+                }
+
                 //Body
 
-                _shift = width1 / Convert.ToDouble(DataCount);
+
                 _bottomOfChart = height1;
                 _xValue = _xValue * diffrenceWidth;
 
@@ -1142,6 +1191,11 @@ namespace LiveChart
                 UpdateLayout();
                 SetGridBackground();
             }
+        }
+
+        public void ForceResize()
+        {
+            Resize(null, null);
         }
     }
 }

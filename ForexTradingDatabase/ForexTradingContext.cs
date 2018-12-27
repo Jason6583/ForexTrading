@@ -19,5 +19,6 @@ namespace ForexTradingDatabase
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<TradingPair> TraidingPairs { get; set; }
         public virtual DbSet<TraidingPairData> TraidingPairDatas { get; set; }
+        public virtual DbSet<PortFolioData> PortFolioDatas { get; set; }
     }
 }

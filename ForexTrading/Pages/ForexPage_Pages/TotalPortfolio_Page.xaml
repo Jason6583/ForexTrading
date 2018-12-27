@@ -8,13 +8,26 @@
       d:DesignHeight="350" d:DesignWidth="150"
       Title="TotalPortfolio_Page">
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="BUY ASSET" 
+                       Style="{StaticResource MenuTextBlockStyle}" 
+                       HorizontalAlignment="Center" 
+                       Margin="10" 
+                       PreviewMouseDown="TextBlock_PreviewMouseDown" 
+                   Grid.Row="0"/>
+        <TextBlock Text="Active assets" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center"  Grid.Row="1"/>
+        <Separator  Grid.Row="2"/>
+        <ScrollViewer Grid.Row="3">
+            <StackPanel x:Name="StackPanel_PortFolio">
 
-    <ScrollViewer>
-        <StackPanel>
-            <TextBlock Text="Active assets" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center"/>
-            <Separator />
+            </StackPanel>
+        </ScrollViewer>
 
-
-        </StackPanel>
-    </ScrollViewer>
+    </Grid>
 </Page>

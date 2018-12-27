@@ -4,46 +4,71 @@
                     xmlns:local="clr-namespace:ForexTrading"
                     >
 
-
     <SolidColorBrush x:Key="GrayBlack" Color="#FF191919"/>
     <SolidColorBrush x:Key="GrayBlackDarker" Color="#FF151515"/>
     <SolidColorBrush x:Key="GrayBlackLighterWithOpacity" Color="#3F252525"/>
     <SolidColorBrush x:Key="GrayBlackLighter" Color="#FF454545"/>
+    <SolidColorBrush x:Key="GrayBlackLighterer" Color="#FF909090"/>
 
     <SolidColorBrush x:Key="LightGold" Color="#FFFFEECA"/>
     <SolidColorBrush x:Key="LightLighter" Color="#FFFFF4DE"/>
 
+    <local:MainWindow x:Key="MainWindow"/>
     <!--DataTemplates-->
     <DataTemplate x:Key="ActiveAssetsTemplate">
-        <StackPanel >
-            <TextBlock Text="{Binding [0]}" Style="{DynamicResource ClassicTextBlockStyle}" />
-            <TextBlock Margin="5,0,0,0">
-                <Run Text="Meno: " FontWeight="Bold"/>
-                <Run Text="{Binding [0]}" />
+        <StackPanel>
+            <TextBlock Margin="5,0,0,0" Style="{DynamicResource ClassicTextBlockStyle}" TextAlignment="Center">
+                <Run Text="Date of purchase" FontWeight="Bold" />
+                <LineBreak/>
+                <Run Text="{Binding [0]}" Foreground="{DynamicResource GrayBlackLighterer}"/>
             </TextBlock>
 
-            <TextBlock Margin="5,0,0,0">
-                <Run Text="Priezvisko: " FontWeight="Bold"/>
-                <Run Text="{Binding [1]}" />
+            <TextBlock Margin="5,0,0,0" Style="{DynamicResource ClassicTextBlockStyle}"  TextAlignment="Center">
+                <Run Text="Trading pair " FontWeight="Bold"/>
+                <LineBreak/>
+                <Run Text="{Binding [1]}" Foreground="{DynamicResource GrayBlackLighterer}"
+                     x:Name="TradingPair"/>
             </TextBlock>
 
-            <TextBlock Margin="5,0,0,0">
-                <Run Text="Rodné číslo: " FontWeight="Bold"/>
-                <Run Text="{Binding [2]}" />
+            <TextBlock Margin="5,0,0,0" Style="{DynamicResource ClassicTextBlockStyle}" 
+                       TextAlignment="Center" 
+                       >
+                <Run Text="Price " FontWeight="Bold" />
+                <LineBreak/>
+                <Run Text="{Binding [2]}" 
+                     FontSize="15"
+                     Foreground="{DynamicResource LightLighter}"
+                     >
+                </Run>
+
             </TextBlock>
 
-            <TextBlock Margin="5,0,0,0">
-                <Run Text="Dátum narodenia: " FontWeight="Bold"/>
-                <Run Text="{Binding [3], StringFormat={}{0:dd/MM/yyyy}}" />
-            </TextBlock>
-
-            <TextBlock Margin="5,0,0,0">
-                <Run Text="Adresa: " FontWeight="Bold"/>
-                <Run Text="{Binding  [4]}" />
+            <TextBlock Margin="5,0,0,0" Style="{DynamicResource ClassicTextBlockStyle}"  TextAlignment="Center">
+                <Run Text="Profit in % " FontWeight="Bold" />
+                <LineBreak/>
+                <Run Text="{Binding [3], StringFormat={}{0} %}" 
+                     FontSize="15"
+                     >
+                    <Run.Foreground>
+                        <MultiBinding Converter="{local:IsLessThanConverter}">
+                            <Binding Path="[1]"/>
+                            <Binding  Path="[2]"/>
+                        </MultiBinding>
+                    </Run.Foreground>
+                </Run>
             </TextBlock>
         </StackPanel>
     </DataTemplate>
 
+    <DataTemplate x:Key="MenuItemTemplate">
+        <TextBlock Margin="5" Style="{DynamicResource MenuTextBlockStyle}" 
+                   TextAlignment="Center" 
+                   FontSize="17"  MouseLeftButtonDown="LeftMouseDown">
+                <Run Text="{Binding [0]}" />
+                <LineBreak/>
+                <Run Text="{Binding [1]}" />
+        </TextBlock>
+    </DataTemplate>
 
     <!--ListViewItem style, remove default style-->
     <Style x:Key="LvItemStyle" TargetType="ListViewItem">
@@ -59,10 +84,10 @@
                             <VisualStateGroup x:Name="SelectionStates">
                                 <VisualState x:Name="Unselected" />
                                 <VisualState x:Name="Selected">
-                                  
+
                                 </VisualState>
                                 <VisualState x:Name="SelectedUnfocused">
-                                   
+
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
@@ -73,12 +98,12 @@
         </Setter>
     </Style>
 
-
     <!--TextBlock styles-->
     <Style x:Key="ClassicTextBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource LightGold}"/>
     </Style>
 
+    <!--Menu style-->
     <Style x:Key="MenuTextBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource GrayBlackLighter}"/>
         <Style.Triggers>
@@ -89,20 +114,31 @@
             <EventTrigger RoutedEvent="UIElement.MouseEnter">
                 <BeginStoryboard>
                     <Storyboard>
-                        <ColorAnimation Duration="0:0:0:0.5" Storyboard.TargetProperty="Foreground.Color" To="AntiqueWhite"/>
+                        <ColorAnimation Duration="0:0:0:0.3" Storyboard.TargetProperty="Foreground.Color" To="#FFFFEECA"/>
                     </Storyboard>
-                </BeginStoryboard> 
+                </BeginStoryboard>
             </EventTrigger>
 
             <EventTrigger RoutedEvent="UIElement.MouseLeave">
                 <BeginStoryboard>
                     <Storyboard>
-                        <ColorAnimation Duration="0:0:0:0.5" Storyboard.TargetProperty="Foreground.Color" To="#FF454545"/>
+                        <ColorAnimation Duration="0:0:0:0.3" Storyboard.TargetProperty="Foreground.Color" To="#FF454545"/>
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
         </Style.Triggers>
     </Style>
+
+    <!--Selected menu style-->
+    <Style x:Key="SelectedMenuTextBlockStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{DynamicResource LightGold}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Cursor" Value="Hand" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
 
     <!--TextBox styles-->
     <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">

@@ -72,6 +72,13 @@
                                             </PathFigure>
                                         </PathGeometry>
                                     </Path.Data>
+                                    <Path.Effect>
+                                        <DropShadowEffect Direction="45" 
+                                                          ShadowDepth="0" 
+                                                          Opacity="0.3" 
+                                                          BlurRadius="3" 
+                                                          Color="{Binding ElementName=LinearChartControl, Path=LineColor}"/>
+                                    </Path.Effect>
                                 </Path>
                             </Canvas>
                             <Ellipse x:Name="Dot" 
@@ -119,7 +126,6 @@
                             <ColumnDefinition  Width="*"/>
                             <ColumnDefinition  Width="*"/>
                         </Grid.ColumnDefinitions>
-
 
                         <Label Grid.Column="0" x:Name="Label_MaxX" Content="1" HorizontalAlignment="Left" Foreground="#3FF8F8FF" FontSize="10"/>
                         <Label Grid.Column="1" x:Name="Label_MinX" Content="10" HorizontalAlignment="Center" Foreground="#3FF8F8FF" FontSize="10"/>

@@ -17,12 +17,14 @@ namespace ForexTradingDatabase
 
         [Key]
         public int Id { get; set; }
-        public int IdTradingPair { get; set; }
+        public TradingPair TradingPair { get; set; }
 
         public DateTime? DateOfBuy { get; set; }
         public DateTime? DateOfSold { get; set; }
 
         public User User { get; set; }
+
+        public double Price { get; set; }
        
     }
 }

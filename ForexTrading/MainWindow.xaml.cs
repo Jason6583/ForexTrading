@@ -77,7 +77,7 @@ namespace ForexTrading
 
             List = new ObservableCollection<KeyValuePair<DateTime, double>>();
 
-
+            Core.LoginUser("pecho4@gmail.com", "1111");
         }
 
         public string IsMaxed
@@ -113,6 +113,11 @@ namespace ForexTrading
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Core.CloseConnection();
         }
     }
 }

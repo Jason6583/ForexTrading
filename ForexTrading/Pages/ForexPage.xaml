@@ -7,17 +7,14 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="950"
       Title="ForexPage"
-      xmlns:linechart="clr-namespace:LiveChart;assembly=LiveChart" Loaded="Page_Loaded"
+      xmlns:linechart="clr-namespace:LiveChart;assembly=LiveChart" Loaded="Page_Loaded" 
       
       >
-
     <Grid>
-
-      <Grid.RowDefinitions>
+        <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <Grid x:Name="Grid_TraidingPairs" 
               Background="{StaticResource GrayBlack}" 
               Width="100" 
@@ -25,7 +22,10 @@
               Height="0" 
               VerticalAlignment="Top"
               Panel.ZIndex="1"
-              Grid.Row="1"
+              Grid.Row="1" 
+              MouseLeave="Grid_TraidingPairs_MouseLeave" MouseEnter="Grid_TraidingPairs_MouseEnter"
+              
+
         >
             <ListView 
                 Background="{StaticResource GrayBlackLighterWithOpacity}" 
@@ -45,21 +45,34 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="pecho4" 
+            <TextBlock Text="{Binding UserEmail}" 
                    Style="{StaticResource MenuTextBlockStyle}" 
                    HorizontalAlignment="Right"
                    FontSize="15"
                    Margin="5"
-                   Grid.Column="1"/>
+                   Grid.Column="1"
+                   x:Name="TextBlock_UserEmail"/>
 
             <TextBlock Text="Trading pairs" 
                        Style="{StaticResource MenuTextBlockStyle}" 
                        HorizontalAlignment="Left"
                        FontSize="15"
                        Margin="5"
-                       Grid.Column="0" 
-                       PreviewMouseDown="TextBlock_Trading_Pairs_PreviewMouseDown"
+                       Grid.Column="0"
+                       MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" 
+
+                       
+
                        />
+
+            <TextBlock Text="{Binding ActualTradingPair}" 
+                       Style="{StaticResource ClassicTextBlockStyle}" 
+                       HorizontalAlignment="Center"
+                       FontSize="15"
+                       Margin="{Binding MarginOfTradingPair}"
+                       Grid.Column="0" 
+
+            />
         </Grid>
 
         <Grid Grid.Row="1">
@@ -77,23 +90,29 @@
                     x:Name="ListView_Menu"
                   >
 
-                <TextBlock Style="{StaticResource MenuTextBlockStyle}" FontSize="15" PreviewMouseDown="TextBlock_PreviewMouseDown" Margin="5" >
-                <Run Text="    TOTAL"/>
-                <LineBreak/>
-                <Run Text="PORTFOLIO"/>
-                </TextBlock>
+                <ContentPresenter Content="{Binding ActivePortfolio}" 
+                                  ContentTemplate="{StaticResource MenuItemTemplate}"
+                                  MouseLeftButtonDown="SideMenu_TotalPortfolio_MouseLeftButtonDown" 
+                                  x:Name="SideMenu_ActivePortfolio"/>
+
+
+                <ContentPresenter Content="{Binding History}" 
+                                  ContentTemplate="{StaticResource MenuItemTemplate}"
+                                  MouseLeftButtonDown="SideMenu_History_MouseLeftButtonDown" 
+                                  x:Name="SideMenu_History"/>
+
             </ListView>
 
             <Frame x:Name="Frame_Menu" Grid.Column="1"/>
 
             <linechart:LiveChartControl Grid.Column="2" 
                                         x:Name="EurUsdChart" 
-                                        LineColor="#FFFFA728" 
-                                        DotColor="#FFFFF97A" 
+                                        LineColor="#FFF1C9A0" 
+                                        DotColor="#FFFFF9F4" 
+                                        AxisColor="#FF212121" 
                                         DataSource="{Binding EurUsD}" 
-                                        Foreground="#FFFFAF3B" 
-                                        FontSize="15" 
-                                        AxisColor="#18FFA728"
+                                        Foreground="{StaticResource LightGold}" 
+                                        FontSize="15"
                                         MinValue="0.075" 
                                         MaxValue="0.078" 
                                         XAxisUnit="Minute" 
@@ -102,14 +121,10 @@
                                         YAxisUnitStringFormat="N5"
                                         GridLineColor="#19383838" 
                                         Margin="15" 
-                                        
-        >
-                <linechart:LiveChartControl.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Transparent" Offset="0"/>
-                        <GradientStop Color="Transparent" Offset="1"/>
-                    </LinearGradientBrush>
-                </linechart:LiveChartControl.Background>
+                                        Loaded="EurUsdChart_Loaded" 
+                                       
+                                        >
+               
                 <linechart:LiveChartControl.ChunkColor>
                     <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
                         <GradientStop Color="#19FFFFFF" Offset="1"/>

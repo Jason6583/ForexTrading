@@ -15,15 +15,28 @@ namespace ForexTradingWcfServiceLibrary
         [OperationContract]
         bool RegisterUser(string name, string surename,string email, string password);
         [OperationContract]
-        void SelectTradingPair(string name);
+        ForexData GetData(int count, string tradingPair);
         [OperationContract]
-        ForexData GetData(int count, DateTime time);
-    }
+        List<string> GetAllTradingPairs();
 
+        [OperationContract]
+        void AddAsset(string tradingPair, long dateOfBuy);
+
+        [OperationContract]
+        long GetServerTime();
+
+        [OperationContract]
+        List<string[]> GetPortFolio();
+
+        [OperationContract]
+        double GetActualValue(string firstAssetName, string secondAssetNamer);
+
+    }
+    
     [DataContract]
     public class ForexData
     {
-        public ForexData(string name, List<KeyValuePair<DateTime, double>> data)
+        public ForexData(string name, List<KeyValuePair<long, double>> data)
         {
             Name = name;
             Data = data;
@@ -32,6 +45,6 @@ namespace ForexTradingWcfServiceLibrary
         [DataMember]
         public string Name { get; set; }
         [DataMember]
-        public List<KeyValuePair<DateTime, double>> Data { get; set; }
+        public List<KeyValuePair<long, double>> Data { get; set; }
     }
 }
