@@ -60,7 +60,7 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="ForexTradingDatabase">
-      <HintPath>..\ForexTradingDatabase\bin\Debug\ForexTradingDatabase.dll</HintPath>
+      <HintPath>..\ForexTradingDatabase\bin\x64\Debug\ForexTradingDatabase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
