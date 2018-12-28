@@ -269,7 +269,7 @@ namespace LiveChart
         }
 
         private Queue<Thread> threads = new Queue<Thread>();
-        private volatile Semaphore semaphore = new Semaphore(1, 10);
+        private volatile Semaphore semaphore = new Semaphore(1, 1000);
         private DateTime lastValue = new DateTime();
 
         private void DataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

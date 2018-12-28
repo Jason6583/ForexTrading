@@ -129,7 +129,7 @@ namespace ForexTradingWcfServiceLibrary
 
         public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
-           
+
             try
             {
                 //Foreing keys are not add without this one
@@ -167,7 +167,7 @@ namespace ForexTradingWcfServiceLibrary
                             item.TradingPair.FirstAsset.Name + "/" +
                             item.TradingPair.SecondAsset.Name,
                             item.Data.Price.ToString(),
-                            (item.Perc * item.Investment).ToString("N2"),
+                            (item.Perc * item.Investment  / 100).ToString("N2"),
                             item.Perc.ToString("N2")
                         }
                     );
@@ -175,28 +175,29 @@ namespace ForexTradingWcfServiceLibrary
 
                 var portfolioSummary = (from x in
                     _forexTradingContext.PortFolioDatas
-                                 join y in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
-                                     on x.TradingPair.Id equals y.Id
-                                 where x.User.Email == _actualUser.Email
-                                 where x.DateOfSold == null
-                                 let value = ((((from v in _forexTradingContext.TraidingPairDatas
-                                                 where v.Date <= _serverTime
-                                                 where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
-                                                 where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
-                                                 orderby v.Date descending
-                                                 select v.Value).FirstOrDefault() * 100 / x.Price) - 100) * x.Investment)
-                                 let perc = ((((from v in _forexTradingContext.TraidingPairDatas
-                                                where v.Date <= _serverTime
-                                                where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
-                                                where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
-                                                orderby v.Date descending
-                                                select v.Value).FirstOrDefault() * 100 / x.Price) - 100))
-                                 select new
-                                 {
-                                     values = value,
-                                     perces = perc,
-                                     investmets = x.Investment
-                                 }
+                                        join y in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
+                                            on x.TradingPair.Id equals y.Id
+                                        where x.User.Email == _actualUser.Email
+                                        where x.DateOfSold == null
+                                        let value = ((((from v in _forexTradingContext.TraidingPairDatas
+                                                        where v.Date <= _serverTime
+                                                        where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
+                                                        where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
+                                                        orderby v.Date descending
+                                                        select v.Value).FirstOrDefault() * 100 / x.Price) - 100) / 100 * x.Investment)
+
+                                        let perc = ((((from v in _forexTradingContext.TraidingPairDatas
+                                                       where v.Date <= _serverTime
+                                                       where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
+                                                       where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
+                                                       orderby v.Date descending
+                                                       select v.Value).FirstOrDefault() * 100 / x.Price) - 100))
+                                        select new
+                                        {
+                                            values = value,
+                                            perces = perc,
+                                            investmets = x.Investment
+                                        }
 
                 );
 
@@ -206,13 +207,13 @@ namespace ForexTradingWcfServiceLibrary
                 var totalInvestment = portfolioSummary.Sum(x => x.investmets);
 
                 var summary = new string[4];
-                summary[0] = portfolioSummary.Count().ToString("N2");
+                summary[0] = portfolioSummary.Count().ToString();
                 summary[1] = totalInvestment.ToString("N2");
                 summary[2] = totalSum.ToString("N2");
                 summary[3] = totalPerc.ToString("N2");
 
 
-                KeyValuePair<string[], List<string[]>> keyValuePair = new KeyValuePair<string[], List<string[]>>(summary,portofolioList);
+                KeyValuePair<string[], List<string[]>> keyValuePair = new KeyValuePair<string[], List<string[]>>(summary, portofolioList);
 
                 return keyValuePair;
             }

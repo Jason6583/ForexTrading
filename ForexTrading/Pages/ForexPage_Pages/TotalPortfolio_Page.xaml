@@ -8,8 +8,9 @@
       d:DesignHeight="350" d:DesignWidth="150"
       Title="TotalPortfolio_Page">
 
-    <Grid>
-        <Grid.RowDefinitions>
+    <Border BorderBrush="{StaticResource GrayBlackLighterWithHigherOpacity}" BorderThickness="0,0,2,0">
+        <Grid>
+            <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -17,16 +18,20 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="Summary stats" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center" Margin="5"/>
-            <ContentPresenter Content="{Binding SummaryStats}" ContentTemplate="{StaticResource TotalPortfolioTemplate}" Margin="5"/>
+            <TextBlock Text="Summary stats" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center" Margin="5" />
+            <ContentPresenter Content="{Binding SummaryStats}" 
+                              ContentTemplate="{StaticResource TotalPortfolioTemplate}" 
+                              Margin="10"
+                              />
         </StackPanel>
         <TextBlock Text="Active assets" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center"  Grid.Row="1"/>
         <Separator  Grid.Row="2" Margin="15,0,15,0"/>
-        <ScrollViewer Grid.Row="3">
+            <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="StackPanel_PortFolio">
 
             </StackPanel>
         </ScrollViewer>
 
-    </Grid>
+        </Grid>
+    </Border>
 </Page>

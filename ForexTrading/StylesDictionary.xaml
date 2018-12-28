@@ -9,7 +9,9 @@
     <SolidColorBrush x:Key="GrayBlackLighterWithOpacity" Color="#3F252525"/>
     <SolidColorBrush x:Key="GrayBlackLighterWithHigherOpacity" Color="#AF252525"/>
     <SolidColorBrush x:Key="GrayBlackLighter" Color="#FF454545"/>
-    <SolidColorBrush x:Key="GrayBlackLighterer" Color="#FF909090"/>
+    <SolidColorBrush x:Key="GrayBlackLighterer" Color="#FFA0A0A0"/>
+    <SolidColorBrush x:Key="Red" Color="#FFF94848"/>
+    <SolidColorBrush x:Key="Green" Color="#FF49C53C"/>
 
     <SolidColorBrush x:Key="LightGold" Color="#FFFFEECA"/>
     <SolidColorBrush x:Key="LightLighter" Color="#FFFFF4DE"/>
@@ -97,7 +99,7 @@
             </Grid>
 
             <TextBlock Text="SELL INVESTMENT" 
-                      Style="{DynamicResource MenuTextBlockWihtoutAnimationStyle}"
+                      Style="{DynamicResource MenuTextBlockStyle}"
                        Grid.Row="1" 
                        HorizontalAlignment="Center"
                        FontSize="12"
@@ -106,7 +108,7 @@
     </DataTemplate>
 
     <DataTemplate x:Key="TotalPortfolioTemplate">
-        <Grid Style="{DynamicResource ActiveAssetGridStyle}">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
@@ -122,7 +124,7 @@
                 <LineBreak/>
                 <Run Text="Total investment"/>
                 <LineBreak/>
-                <Run Text="{Binding [1]}" Foreground="{DynamicResource LightLighter}"/>
+                <Run Text="{Binding [1], StringFormat={}{0} €}" Foreground="{DynamicResource LightLighter}"/>
             </TextBlock>
 
             <Grid Grid.Column="1" >
@@ -136,7 +138,7 @@
                        TextAlignment="Right" 
                         Grid.Row="0" 
                         HorizontalAlignment="Right"
-                         FontSize="20"
+                         FontSize="25"
                        >
                         <Run Text="{Binding [2], StringFormat={}{0} €}" 
                              Foreground="{Binding [2], Converter={local:TotalSumConverter}}"/>
@@ -220,17 +222,6 @@
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--Withou animation-->
-    <Style x:Key="MenuTextBlockWihtoutAnimationStyle" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{DynamicResource GrayBlackLighterer}"/>
-        <Setter Property="FontWeight" Value="Thin"/>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="Hand" />
-            </Trigger>
         </Style.Triggers>
     </Style>
 

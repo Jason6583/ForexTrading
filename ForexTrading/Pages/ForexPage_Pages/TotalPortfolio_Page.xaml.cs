@@ -39,7 +39,7 @@ namespace ForexTrading.Pages.ForexPage_Pages
             set
             {
                 _summaryStats = value;
-                OnPropertyChanged(nameof(_summaryStats));
+                OnPropertyChanged("SummaryStats");
             }
         }
 
@@ -48,37 +48,38 @@ namespace ForexTrading.Pages.ForexPage_Pages
 
         public void LoadPortfolio(KeyValuePair<string[], List<string[]>> portofolioData)
         {
-            Dispatcher.Invoke(() =>
+            if (portofolioData.Key != null)
             {
-                //Parameters have to be invoked by Task.run
-                SummaryStats = portofolioData.Key;
-
-                while (contentPresenters.Count < portofolioData.Value.Count)
+                Dispatcher.Invoke(() =>
                 {
-                    ContentPresenter contentPresenter = new ContentPresenter();
-                    contentPresenter.ContentTemplate = FindResource("ActiveAssetsTemplate") as DataTemplate;
-                    contentPresenter.Margin = new Thickness(5);
-
-                    Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(contentPresenter); });
-
-                    Separator separator = new Separator()
+                    //Parameters have to be invoked by Task.run
+                    SummaryStats = portofolioData.Key;
+                    while (contentPresenters.Count < portofolioData.Value.Count)
                     {
-                        Margin = new Thickness(10, 5, 10, 5),
-                        Background = (SolidColorBrush) (new BrushConverter().ConvertFrom("#AF252525"))
-                    };
+                        ContentPresenter contentPresenter = new ContentPresenter();
+                        contentPresenter.ContentTemplate = FindResource("ActiveAssetsTemplate") as DataTemplate;
+                        contentPresenter.Margin = new Thickness(5);
 
-                    Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(separator); });
-                    contentPresenters.Add(contentPresenter);
-                }
+                        Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(contentPresenter); });
 
-                int i = 0;
-                foreach (var item in portofolioData.Value)
-                {
+                        Separator separator = new Separator()
+                        {
+                            Margin = new Thickness(10, 5, 10, 5),
+                            Background = (SolidColorBrush) (new BrushConverter().ConvertFrom("#AF252525"))
+                        };
 
-                    (contentPresenters[i]).Content = item;
-                    i++;
-                }
-            });
+                        Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(separator); });
+                        contentPresenters.Add(contentPresenter);
+                    }
+
+                    int i = 0;
+                    foreach (var item in portofolioData.Value)
+                    {
+                        (contentPresenters[i]).Content = item;
+                        i++;
+                    }
+                });
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -106,9 +106,6 @@
 
             <Frame x:Name="Frame_Menu" Grid.Column="1"/>
 
-            <ContentPresenter Grid.Column="2" x:Name="GRID_SKUSKA">
-
-            </ContentPresenter>
             <linechart:LiveChartControl Grid.Column="2" 
                                         x:Name="EurUsdChart" 
                                         LineColor="#FFF1C9A0" 

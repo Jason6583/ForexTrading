@@ -152,10 +152,9 @@ namespace ForexTrading.Core
         {
             //Entity returns sometimes error with query, only sometimes with same data, thats weird
             KeyValuePair<string[], List<string[]>> foo = new KeyValuePair<string[], List<string[]>>();
-            do
-            {
-                foo = _tradingServiceClient.GetPortFolio();
-            } while (foo.Key == null);
+
+            foo = _tradingServiceClient.GetPortFolio();
+
 
             return foo;
         }

@@ -85,9 +85,9 @@ namespace ForexTrading
         {
             var tradingPair = ((string)values[0]).Split('/');
             if (System.Convert.ToDouble(((string)values[1]).Replace('.', ',')) > StylesDictionary._mainWindow.Core.GetActualValue(tradingPair[0], tradingPair[1]))
-                return Brushes.Red;
+                return StylesDictionary._mainWindow.FindResource("Red") as SolidColorBrush;
             else
-                return Brushes.Green;
+                return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -102,9 +102,9 @@ namespace ForexTrading
             object parameter, CultureInfo culture)
         {
             if (System.Convert.ToDouble(((string)value).Replace('.', ',')) > 0)
-                return Brushes.Green;
+                return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
             else
-                return Brushes.Red;
+                return StylesDictionary._mainWindow.FindResource("Red") as SolidColorBrush;
         }
 
         public object ConvertBack(object value, Type targetType,

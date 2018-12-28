@@ -411,8 +411,6 @@ namespace ForexTrading.Pages
                 SwitchMenu(SideMenuItem.ActivePortfolio);
             }
 
-            //Deadlock error in wcf
-
             _totalPortfolio_Page.LoadPortfolio(_mainWindow.Core.GetPortFolio());
 
 
