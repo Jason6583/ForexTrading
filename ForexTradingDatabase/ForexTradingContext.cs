@@ -12,7 +12,12 @@ namespace ForexTradingDatabase
     {
         public ForexTradingContext() : base("name=ForexTradingContext")
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext,Configuration>());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
+        }
+
+        public ForexTradingContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+
         }
 
         public virtual DbSet<User> Users { get; set; }

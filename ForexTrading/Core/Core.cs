@@ -5,6 +5,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ForexTrading.Windows;
 using ForexTradingWcfServiceLibrary;
 
 namespace ForexTrading.Core
@@ -104,10 +105,15 @@ namespace ForexTrading.Core
         /// <param name="password"></param>
         public void LoginUser(string email, string password)
         {
-            if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+            Task.Run(() =>
             {
-                UserEmail = email;
-            }
+                while (_tradingServiceClient == null)
+                    ;
+                if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+                {
+                    UserEmail = email;
+                }
+            });
         }
 
 
@@ -132,7 +138,17 @@ namespace ForexTrading.Core
 
         public List<string> GetAllTradingPairs()
         {
-            List<string> foo = _tradingServiceClient.GetAllTradingPairs();
+            List<string> foo = null;
+            try
+            {
+                foo = _tradingServiceClient.GetAllTradingPairs();
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.Show(ex.Message);
+            }
+
+
             return foo;
         }
 

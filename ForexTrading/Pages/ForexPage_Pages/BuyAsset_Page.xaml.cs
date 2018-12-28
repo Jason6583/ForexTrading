@@ -21,16 +21,16 @@ namespace ForexTrading.Pages.ForexPage_Pages
     /// </summary>
     public partial class BuyAsset_Page : Page
     {
-        private MainWindow _mainWindow;
-        public BuyAsset_Page(MainWindow mainWindow)
+        private Core.Core _core;
+        public BuyAsset_Page(Core.Core core)
         {
             InitializeComponent();
-            _mainWindow = mainWindow;
+            _core = core;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            ComboBox_TradingPair.ItemsSource = _mainWindow.Core.GetAllTradingPairs();
+            ComboBox_TradingPair.ItemsSource = _core.GetAllTradingPairs();
             ComboBox_TradingPair.SelectedValue = ComboBox_TradingPair.Items[0];
         }
 
@@ -40,11 +40,11 @@ namespace ForexTrading.Pages.ForexPage_Pages
             {
                 double value = Convert.ToDouble(TextBox_Investment.Text);
                 string traidingPair = ComboBox_TradingPair.SelectedValue.ToString();
-                DateTime serverTime = _mainWindow.Core.GetServerTime();
+                DateTime serverTime = _core.GetServerTime();
 
                 Task.Run(() =>
                 {
-                    _mainWindow.Core.AddAsset(traidingPair, serverTime,value);
+                    _core.AddAsset(traidingPair, serverTime,value);
                 });
 
                 CustomMessageBox.Show("Asset was successfully bought");

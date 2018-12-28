@@ -37,7 +37,7 @@ namespace ForexTrading.Pages
             History
         }
 
-        MainWindow _mainWindow;
+        Core.Core _core;
         ObservableCollection<KeyValuePair<DateTime, double>> _eurUsd;
 
         int _dataCount;
@@ -144,12 +144,13 @@ namespace ForexTrading.Pages
         #endregion
         string _actualTradingPair;
 
-        public ForexPage(MainWindow mainWindow)
+        public ForexPage(Core.Core core)
         {
             InitializeComponent();
+            _core = core;
             DataContext = this;
             DataCount = 200;
-            UserEmail = mainWindow.Core.UserEmail;
+            UserEmail = core.UserEmail;
 
             //Initializing headers for side menu
             ActivePortfolio = new string[2];
@@ -170,17 +171,15 @@ namespace ForexTrading.Pages
 
             //Inicializing pages
 
-
-            _buyAsset_Page = new BuyAsset_Page(mainWindow);
+            _buyAsset_Page = new BuyAsset_Page(core);
             _historyPage_Page = new History_Page();
             //Intializing datasources for chart
-            _mainWindow = mainWindow;
 
             EurUsD = new ObservableCollection<KeyValuePair<DateTime, double>>();
             ActualTradingPair = "EUR/USD";
             LoadTradingPairs();
 
-            mainWindow.Core.Client.ReceiveDataEvent += Client_ReceiveDataEvent;
+            _core.Client.ReceiveDataEvent += Client_ReceiveDataEvent;
 
             _totalPortfolio_Page = new TotalPortfolio_Page();
 
@@ -199,7 +198,7 @@ namespace ForexTrading.Pages
             if (_isSideMenuUp)
                 Task.Run(() =>
                  {
-                     _totalPortfolio_Page.LoadPortfolio(_mainWindow.Core.GetPortFolio());
+                     _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
                  });
         }
 
@@ -218,12 +217,14 @@ namespace ForexTrading.Pages
 
         private void EurUsdChart_Loaded(object sender, RoutedEventArgs e)
         {
-            var data = _mainWindow.Core.GetData(DataCount, "EUR/USD");
+            var data = _core.GetData(DataCount, "EUR/USD");
             EurUsdChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(data));
 
         }
 
-        //Region for top menu events
+        /// <summary>
+        /// Region for top menu
+        /// </summary>
         #region Top menu region
         double _menuHeight = 100;
         private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
@@ -273,7 +274,7 @@ namespace ForexTrading.Pages
         /// </summary>
         private void LoadTradingPairs()
         {
-            var traidingPairs = _mainWindow.Core.GetAllTradingPairs();
+            var traidingPairs = _core.GetAllTradingPairs();
 
             CreateMenuTP(traidingPairs.Count);
 
@@ -327,9 +328,6 @@ namespace ForexTrading.Pages
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-
-        private volatile Semaphore semaphore = new Semaphore(1, 10);
-
         private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Tries open same trading pairs as it is shown
@@ -337,7 +335,7 @@ namespace ForexTrading.Pages
             {
                 ActualTradingPair = ((TextBlock)sender).Text;
                 EurUsdChart.Clear();
-                var forexData = _mainWindow.Core.GetData(DataCount, ActualTradingPair);
+                var forexData = _core.GetData(DataCount, ActualTradingPair);
                 EurUsdChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(forexData));
             }
         }
@@ -350,8 +348,6 @@ namespace ForexTrading.Pages
         /// <param name="sender"></param>
         /// <param name="e"></param>
         #region Side menu region
-
-
         private void SwitchMenu(SideMenuItem sideMenuItem)
         {
             switch (sideMenuItem)
@@ -411,7 +407,7 @@ namespace ForexTrading.Pages
                 SwitchMenu(SideMenuItem.ActivePortfolio);
             }
 
-            _totalPortfolio_Page.LoadPortfolio(_mainWindow.Core.GetPortFolio());
+            _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
 
 
         }
@@ -490,7 +486,5 @@ namespace ForexTrading.Pages
         {
             MarginOfTradingPair = new Thickness(TextBlock_UserEmail.ActualWidth, 0, 0, 0);
         }
-
-
     }
 }

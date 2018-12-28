@@ -53,11 +53,12 @@ namespace ForexTrading
             InitializeComponent();
 
             Core = new Core.Core();
-            
+            Core.LoginUser("pecho4@gmail.com", "1111");
+
             //Iniciliazing pages
             Login_Page = new Login_Page(this);
             Register_Page = new Register_Page(this);
-            Forex_Page = new ForexPage(this);
+            Forex_Page = new ForexPage(Core);
 
             //Iniciliazing frame
             Frame = new Frame();
@@ -77,7 +78,7 @@ namespace ForexTrading
 
             List = new ObservableCollection<KeyValuePair<DateTime, double>>();
 
-            Core.LoginUser("pecho4@gmail.com", "1111");
+            
         }
         
         public string IsMaxed

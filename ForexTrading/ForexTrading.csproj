@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BCC7E567-CCB0-47EB-BD85-AF2D5D84798A}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>ForexTrading</RootNamespace>
     <AssemblyName>ForexTrading</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

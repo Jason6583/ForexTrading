@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.EntityClient;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -16,8 +18,8 @@ namespace ForexTradingWcfServiceLibrary
     {
         private ITradingForexClient _user;
         private string _selectedPair;
-        private ForexTradingContext _forexTradingContext = new ForexTradingContext();
-        private DateTime _serverTime = new DateTime(2017, 1, 2, 8, 1, 0);
+        private static ForexTradingContext _forexTradingContext = new ForexTradingContext();
+        private static DateTime _serverTime = new DateTime(2017, 1, 2, 8, 1, 0);
         private string _actualTradingPair = "EUR/USD";
         User _actualUser;
         Queue<string> logs;
@@ -25,7 +27,7 @@ namespace ForexTradingWcfServiceLibrary
         {
             System.Timers.Timer aTimer = new System.Timers.Timer();
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 800;
+            aTimer.Interval = 500;
             aTimer.Enabled = true;
             logs = new Queue<string>();
         }
@@ -288,7 +290,7 @@ namespace ForexTradingWcfServiceLibrary
             }
             catch (Exception ex)
             {
-                string message = $"{_serverTime} {_actualUser.Email} was dissconeted";
+                string message = $"{_serverTime} {_actualUser.Email} was disconeted";
                 Console.WriteLine(message);
                 logs.Enqueue(message);
                 _user = null;
