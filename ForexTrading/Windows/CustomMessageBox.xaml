@@ -39,10 +39,10 @@
                            FontSize="20"  />
                 <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" >
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" >
-                        <Button Name="btnOk" Content="OK" Style="{StaticResource ClassicButtonStyle}" Margin="10"  Click="Button_Click" FontSize="18" VerticalAlignment="Center"  HorizontalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
-                        <Button Name="btnYes" Content="Yes" Margin="10" Click="Button_Click" FontSize="18" Style="{StaticResource ClassicButtonStyle}"  VerticalAlignment="Center" HorizontalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <Button Name="btnNo" Content="No" Margin="10" Click="Button_Click" FontSize="18" Style="{StaticResource ClassicButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch"   VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
-                        <Button Name="btnCancel" Margin="10" Content="Cancel"  Click="Button_Click" Style="{StaticResource ClassicButtonStyle}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                        <TextBlock Name="btnOk" Text="OK" Margin="10"  MouseLeftButtonDown="Button_Click" Style="{StaticResource MenuTextBlockStyle}"   FontSize="18" VerticalAlignment="Center"  HorizontalAlignment="Stretch"  />
+                        <TextBlock Name="btnYes" Text="Yes" Margin="10" MouseLeftButtonDown="Button_Click" FontSize="18" Style="{StaticResource MenuTextBlockStyle}"  VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                        <TextBlock Name="btnNo" Text="No" Margin="10" MouseLeftButtonDown="Button_Click" FontSize="18" Style="{StaticResource MenuTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch"   />
+                        <TextBlock Name="btnCancel" Text="Cancel" Margin="10"   MouseLeftButtonDown="Button_Click" Style="{StaticResource MenuTextBlockStyle}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                     </StackPanel>
                 </Grid>
             </Grid>

@@ -79,7 +79,7 @@ namespace ForexTrading
 
             Core.LoginUser("pecho4@gmail.com", "1111");
         }
-
+        
         public string IsMaxed
         {
             get { return _isMaxed; }

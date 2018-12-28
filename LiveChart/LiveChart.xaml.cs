@@ -1196,6 +1196,7 @@ namespace LiveChart
         public void ForceResize()
         {
             Resize(null, null);
+            semaphore.Release();
         }
     }
 }

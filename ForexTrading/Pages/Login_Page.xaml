@@ -33,21 +33,23 @@
         <TextBlock Text="Password" Grid.Row="3"   HorizontalAlignment="Center" />
         <PasswordBox x:Name="TextBox_Password" Grid.Row="4"   Style="{StaticResource PasswordBoxStyle}" FontSize="15" Width="300"/>
 
-        <Button x:Name="Button_Login" 
+        <TextBlock x:Name="Button_Login" 
                 Grid.Row="5" 
-                Content="Log in" Margin="15" 
-                Style="{StaticResource ClassicButtonStyle}"
+                Text="Log in" Margin="15" 
+                Style="{StaticResource MenuTextBlockStyle}"
                 FontSize="30" 
-                Click="Button_Login_Click"
+                MouseLeftButtonDown="Button_Login_Click"
+                HorizontalAlignment="Center"
+               
                 />
 
-        <Button x:Name="Button_Create" 
+        <TextBlock x:Name="Button_Create" 
                     Grid.Row="0" 
-                    Content="Create account" 
+                   Text="Create account" 
                     Margin="5" 
-                    Style="{StaticResource ClassicButtonStyle}"
+                    Style="{StaticResource MenuTextBlockStyle}"
                     FontSize="12" 
-                    Click="Button_Create_Click"
+                   MouseLeftButtonDown="Button_Create_Click"
                     VerticalAlignment="Top"
                     HorizontalAlignment="Left"
             />

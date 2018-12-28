@@ -15,14 +15,13 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="BUY ASSET" 
-                       Style="{StaticResource MenuTextBlockStyle}" 
-                       HorizontalAlignment="Center" 
-                       Margin="10" 
-                       PreviewMouseDown="TextBlock_PreviewMouseDown" 
-                   Grid.Row="0"/>
+
+        <StackPanel>
+            <TextBlock Text="Summary stats" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center" Margin="5"/>
+            <ContentPresenter Content="{Binding SummaryStats}" ContentTemplate="{StaticResource TotalPortfolioTemplate}" Margin="5"/>
+        </StackPanel>
         <TextBlock Text="Active assets" Style="{StaticResource ClassicTextBlockStyle}" HorizontalAlignment="Center"  Grid.Row="1"/>
-        <Separator  Grid.Row="2"/>
+        <Separator  Grid.Row="2" Margin="15,0,15,0"/>
         <ScrollViewer Grid.Row="3">
             <StackPanel x:Name="StackPanel_PortFolio">
 

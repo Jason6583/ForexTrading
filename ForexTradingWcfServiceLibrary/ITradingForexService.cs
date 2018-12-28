@@ -20,13 +20,13 @@ namespace ForexTradingWcfServiceLibrary
         List<string> GetAllTradingPairs();
 
         [OperationContract]
-        void AddAsset(string tradingPair, long dateOfBuy);
+        void AddAsset(string tradingPair, long dateOfBuy, double investment);
 
         [OperationContract]
         long GetServerTime();
 
         [OperationContract]
-        List<string[]> GetPortFolio();
+        KeyValuePair<string[], List<string[]>> GetPortFolio();
 
         [OperationContract]
         double GetActualValue(string firstAssetName, string secondAssetNamer);

@@ -23,9 +23,8 @@
               VerticalAlignment="Top"
               Panel.ZIndex="1"
               Grid.Row="1" 
-              MouseLeave="Grid_TraidingPairs_MouseLeave" MouseEnter="Grid_TraidingPairs_MouseEnter"
-              
-
+              MouseLeave="Grid_TraidingPairs_MouseLeave" 
+              MouseEnter="Grid_TraidingPairs_MouseEnter"          
         >
             <ListView 
                 Background="{StaticResource GrayBlackLighterWithOpacity}" 
@@ -59,10 +58,7 @@
                        FontSize="15"
                        Margin="5"
                        Grid.Column="0"
-                       MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" 
-
-                       
-
+                       MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave"                
                        />
 
             <TextBlock Text="{Binding ActualTradingPair}" 
@@ -90,6 +86,11 @@
                     x:Name="ListView_Menu"
                   >
 
+                <ContentPresenter Content="{Binding BuyAsset}" 
+                                  ContentTemplate="{StaticResource MenuItemTemplate}"
+                                  MouseLeftButtonDown="SideMenu_BuyAsset_MouseLeftButtonDown" 
+                                  x:Name="SideMenu_BuyAsset"/>
+
                 <ContentPresenter Content="{Binding ActivePortfolio}" 
                                   ContentTemplate="{StaticResource MenuItemTemplate}"
                                   MouseLeftButtonDown="SideMenu_TotalPortfolio_MouseLeftButtonDown" 
@@ -105,6 +106,9 @@
 
             <Frame x:Name="Frame_Menu" Grid.Column="1"/>
 
+            <ContentPresenter Grid.Column="2" x:Name="GRID_SKUSKA">
+
+            </ContentPresenter>
             <linechart:LiveChartControl Grid.Column="2" 
                                         x:Name="EurUsdChart" 
                                         LineColor="#FFF1C9A0" 
@@ -124,7 +128,7 @@
                                         Loaded="EurUsdChart_Loaded" 
                                        
                                         >
-               
+
                 <linechart:LiveChartControl.ChunkColor>
                     <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
                         <GradientStop Color="#19FFFFFF" Offset="1"/>

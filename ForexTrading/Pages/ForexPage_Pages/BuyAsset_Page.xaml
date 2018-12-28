@@ -1,0 +1,57 @@
+﻿<Page x:Class="ForexTrading.Pages.ForexPage_Pages.BuyAsset_Page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ForexTrading.Pages.ForexPage_Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450"
+      d:DesignWidth="150"
+      Title="BuyTradingPair" Loaded="Page_Loaded"
+      >
+
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="ASSET" 
+                       Style="{StaticResource ClassicTextBlockStyle}" 
+                       HorizontalAlignment="Center"
+                       Margin="4"/>
+            <ComboBox Margin="5" x:Name="ComboBox_TradingPair" Style="{StaticResource ComboBoxStyle}" Width="100" FontSize="15" />
+            <TextBlock Text="ACTUAL PRICE" 
+                       Style="{StaticResource ClassicTextBlockStyle}" 
+                       HorizontalAlignment="Center"
+                       Margin="5"/>
+
+            <TextBlock Text="ACTUAL PRICE" 
+                       Foreground="{StaticResource GrayBlackLighter}"
+                       HorizontalAlignment="Center"
+                       Margin="5"
+                       FontSize="15"/>
+            <TextBlock 
+                Text="INVESTMENT" 
+                HorizontalAlignment="Center" 
+                Style="{StaticResource ClassicTextBlockStyle}"
+                Margin="5"/>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Style="{StaticResource TextBoxStyle}" 
+                         Grid.Column="0"
+                         x:Name="TextBox_Investment" 
+                         Width="{Binding ElementName=ComboBox_TradingPair, Path=ActualWidth}" 
+                         HorizontalAlignment="Center"
+                         Margin="15,0,0,0"/>
+                <TextBlock 
+                    Text="€" 
+                    HorizontalAlignment="Left" 
+                    Style="{StaticResource ClassicTextBlockStyle}"
+                    Margin="5,0,5,0"
+                    FontSize="15"
+                    Grid.Column="1"/>
+            </Grid>
+            <TextBlock Text="BUY" Style="{StaticResource MenuTextBlockStyle}" HorizontalAlignment="Center"  Margin="10" MouseLeftButtonDown="BUY_CLICK" FontSize="20"/>
+        </StackPanel>
+    </Grid>
+</Page>

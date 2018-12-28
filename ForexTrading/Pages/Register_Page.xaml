@@ -34,7 +34,7 @@
 
         <TextBlock Text="Name" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" />
         <TextBox x:Name="TextBox_Name" Grid.Row="1"  Style="{StaticResource TextBoxStyle}" FontSize="15" Width="300"/>
-        
+
         <TextBlock Text="Surename" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" />
         <TextBox x:Name="TextBox_SureName" Grid.Row="3"  Style="{StaticResource TextBoxStyle}" FontSize="15" Width="300"/>
 
@@ -47,21 +47,22 @@
         <TextBlock Text="Password again" Grid.Row="8"   HorizontalAlignment="Center" />
         <PasswordBox x:Name="TextBox_PasswordAgain" Grid.Row="9"   Style="{StaticResource PasswordBoxStyle}" FontSize="15" Width="300"/>
 
-        <Button x:Name="Button_Create" 
+        <TextBlock x:Name="Button_Create" 
                 Grid.Row="10" 
-                Content="Register" Margin="15" 
-                Style="{StaticResource ClassicButtonStyle}"
+                Text="Register" Margin="15" 
+                Style="{StaticResource MenuTextBlockStyle}"
                 FontSize="25" 
-                Click="Button_Register_Click"
+                MouseLeftButtonDown="Button_Register_Click"
+                   HorizontalAlignment="Center"
         />
 
-        <Button x:Name="Button_Login" 
+        <TextBlock x:Name="Button_Login" 
                 Grid.Row="0" 
-                Content="Log in" 
+                Text="Log in" 
                 Margin="5" 
-                Style="{StaticResource ClassicButtonStyle}"
+                Style="{StaticResource MenuTextBlockStyle}"
                 FontSize="12" 
-                Click="Button_Login_Click"
+                MouseLeftButtonDown="Button_Login_Click"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
         />

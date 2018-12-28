@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ForexTrading.Annotations;
 using ForexTrading.Windows;
 using ForexTrading.Core;
 
@@ -20,53 +24,69 @@ namespace ForexTrading.Pages.ForexPage_Pages
     /// <summary>
     /// Interaction logic for TotalPortfolio_Page.xaml
     /// </summary>
-    public partial class TotalPortfolio_Page : Page
+    public partial class TotalPortfolio_Page : Page, INotifyPropertyChanged
     {
-        ForexPage _forexPage;
-        public TotalPortfolio_Page(ForexPage forexPage)
+        string[] _summaryStats;
+        public TotalPortfolio_Page()
         {
             InitializeComponent();
-            _forexPage = forexPage;
+            DataContext = this;
         }
 
-        private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        public string[] SummaryStats
         {
-            MessageBoxResult result = CustomMessageBox.Show("Purchase asset",
-                "Do you really want to purchase actual asset?", MessageBoxButton.YesNoCancel);
-
-            switch (result)
+            get { return _summaryStats; }
+            set
             {
-                case MessageBoxResult.Yes:
-                    _forexPage.BuyActualAsset();
-                    break;
+                _summaryStats = value;
+                OnPropertyChanged(nameof(_summaryStats));
             }
         }
 
-        public void LoadPortfolio(List<string[]> portofolioData)
+        private List<ContentPresenter> contentPresenters = new List<ContentPresenter>();
+
+
+        public void LoadPortfolio(KeyValuePair<string[], List<string[]>> portofolioData)
         {
             Dispatcher.Invoke(() =>
             {
-                StackPanel_PortFolio.Children.Clear();
+                //Parameters have to be invoked by Task.run
+                SummaryStats = portofolioData.Key;
 
-
-                int i = 1;
-                foreach (var item in portofolioData)
+                while (contentPresenters.Count < portofolioData.Value.Count)
                 {
                     ContentPresenter contentPresenter = new ContentPresenter();
-                    contentPresenter.Content = item;
                     contentPresenter.ContentTemplate = FindResource("ActiveAssetsTemplate") as DataTemplate;
                     contentPresenter.Margin = new Thickness(5);
 
-                    if (i != portofolioData.Count)
-                    {
-                        Separator separator = new Separator();
-                        StackPanel_PortFolio.Children.Add(separator);
-                    }
+                    Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(contentPresenter); });
 
-                    StackPanel_PortFolio.Children.Add(contentPresenter);
+                    Separator separator = new Separator()
+                    {
+                        Margin = new Thickness(10, 5, 10, 5),
+                        Background = (SolidColorBrush) (new BrushConverter().ConvertFrom("#AF252525"))
+                    };
+
+                    Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(separator); });
+                    contentPresenters.Add(contentPresenter);
+                }
+
+                int i = 0;
+                foreach (var item in portofolioData.Value)
+                {
+
+                    (contentPresenters[i]).Content = item;
                     i++;
                 }
             });
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

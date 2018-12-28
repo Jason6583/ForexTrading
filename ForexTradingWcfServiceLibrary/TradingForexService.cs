@@ -34,7 +34,7 @@ namespace ForexTradingWcfServiceLibrary
         {
             User user = _forexTradingContext.Users.SingleOrDefault(x => x.Email == email);
             var conn = OperationContext.Current.GetCallbackChannel<ITradingForexClient>();
-           
+
             if (user != null)
             {
                 if (BCrypt.Net.BCrypt.Verify(password, user.Password))
@@ -82,9 +82,8 @@ namespace ForexTradingWcfServiceLibrary
                 .ToList();
         }
 
-        public void AddAsset(string tradingPair, long dateOfBuy)
+        public void AddAsset(string tradingPair, long dateOfBuy, double investment)
         {
-
             DateTime timeOfBuy = new DateTime(dateOfBuy, DateTimeKind.Utc);
 
             TradingPair tradingPairId = (from x in _forexTradingContext.TraidingPairs
@@ -101,7 +100,13 @@ namespace ForexTradingWcfServiceLibrary
                             select x.Value).First();
 
             _forexTradingContext.PortFolioDatas.Add(new PortFolioData()
-            { TradingPair = tradingPairId, DateOfBuy = timeOfBuy, User = _actualUser, Price = value });
+            {
+                TradingPair = tradingPairId,
+                DateOfBuy = timeOfBuy,
+                User = _actualUser,
+                Price = value,
+                Investment = investment
+            });
 
             _forexTradingContext.SaveChanges();
 
@@ -118,54 +123,108 @@ namespace ForexTradingWcfServiceLibrary
             public PortFolioData Data { get; set; }
 
             public double Perc { get; set; }
+
+            public double Investment { get; set; }
         }
 
-        public List<string[]> GetPortFolio()
+        public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
-
-            //Foreing keys are not add without this one
-            var pom = (from x in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
-                       select x).ToList();
-
-            var portfolio = (from x in
-                    _forexTradingContext.PortFolioDatas
-                             join y in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
-                             on x.TradingPair.Id equals y.Id
-                             where x.User.Email == _actualUser.Email
-                             where x.DateOfSold == null
-                             select new TradingDataFoo
-                             {
-                                 Data = x,
-                                 TradingPair = y,
-                                 Perc = ((from v in _forexTradingContext.TraidingPairDatas
-                                          where v.Date <= _serverTime
-                                          where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
-                                          where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
-                                          orderby v.Date descending
-                                          select v.Value).FirstOrDefault() * 100 / x.Price) - 100
-                             }).ToList();
-
-
-            List<string[]> portofolioList = new List<string[]>();
-            foreach (var item in portfolio)
+           
+            try
             {
+                //Foreing keys are not add without this one
+                var pom = (from x in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
+                           select x).ToList();
 
-                portofolioList.Add(new string[] {
-                    item.Data.DateOfBuy.Value.ToString("MM/dd/yyyy HH:mm"),
-                    item.TradingPair.FirstAsset.Name + "/" +
-                    item.TradingPair.SecondAsset.Name,
-                    item.Data.Price.ToString(),
-                    item.Perc.ToString("N2")
-                    }
+                var portfolio = (from x in
+                        _forexTradingContext.PortFolioDatas
+                                 join y in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
+                                     on x.TradingPair.Id equals y.Id
+                                 where x.User.Email == _actualUser.Email
+                                 where x.DateOfSold == null
+                                 select new TradingDataFoo
+                                 {
+                                     Data = x,
+                                     TradingPair = y,
+                                     Perc = ((from v in _forexTradingContext.TraidingPairDatas
+                                              where v.Date <= _serverTime
+                                              where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
+                                              where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
+                                              orderby v.Date descending
+                                              select v.Value).FirstOrDefault() * 100 / x.Price) - 100,
+                                     Investment = x.Investment
+                                 }).ToList();
+
+
+                List<string[]> portofolioList = new List<string[]>();
+                foreach (var item in portfolio)
+                {
+
+                    portofolioList.Add(new string[]
+                        {
+                            item.Data.DateOfBuy.Value.ToString("MM/dd/yyyy "),
+                            item.Data.DateOfBuy.Value.ToString("HH:mm"),
+                            item.TradingPair.FirstAsset.Name + "/" +
+                            item.TradingPair.SecondAsset.Name,
+                            item.Data.Price.ToString(),
+                            (item.Perc * item.Investment).ToString("N2"),
+                            item.Perc.ToString("N2")
+                        }
+                    );
+                }
+
+                var portfolioSummary = (from x in
+                    _forexTradingContext.PortFolioDatas
+                                 join y in _forexTradingContext.TraidingPairs.Include("FirstAsset").Include("SecondAsset")
+                                     on x.TradingPair.Id equals y.Id
+                                 where x.User.Email == _actualUser.Email
+                                 where x.DateOfSold == null
+                                 let value = ((((from v in _forexTradingContext.TraidingPairDatas
+                                                 where v.Date <= _serverTime
+                                                 where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
+                                                 where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
+                                                 orderby v.Date descending
+                                                 select v.Value).FirstOrDefault() * 100 / x.Price) - 100) * x.Investment)
+                                 let perc = ((((from v in _forexTradingContext.TraidingPairDatas
+                                                where v.Date <= _serverTime
+                                                where v.TradingPair.FirstAsset.Name == y.FirstAsset.Name
+                                                where v.TradingPair.SecondAsset.Name == y.SecondAsset.Name
+                                                orderby v.Date descending
+                                                select v.Value).FirstOrDefault() * 100 / x.Price) - 100))
+                                 select new
+                                 {
+                                     values = value,
+                                     perces = perc,
+                                     investmets = x.Investment
+                                 }
+
                 );
-            }
 
-            return portofolioList;
+
+                var totalSum = portfolioSummary.Sum(x => x.values);
+                var totalPerc = portfolioSummary.Sum(x => x.perces) / portfolioSummary.Count();
+                var totalInvestment = portfolioSummary.Sum(x => x.investmets);
+
+                var summary = new string[4];
+                summary[0] = portfolioSummary.Count().ToString("N2");
+                summary[1] = totalInvestment.ToString("N2");
+                summary[2] = totalSum.ToString("N2");
+                summary[3] = totalPerc.ToString("N2");
+
+
+                KeyValuePair<string[], List<string[]>> keyValuePair = new KeyValuePair<string[], List<string[]>>(summary,portofolioList);
+
+                return keyValuePair;
+            }
+            catch (Exception ex)
+            {
+                return new KeyValuePair<string[], List<string[]>>();
+            }
         }
+
 
         public double GetActualValue(string firstAssetName, string secondAssetName)
         {
-
             return (from x in _forexTradingContext.TraidingPairDatas
                     where x.Date <= _serverTime
                     where x.TradingPair.FirstAsset.Name == firstAssetName

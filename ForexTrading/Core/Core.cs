@@ -86,7 +86,6 @@ namespace ForexTrading.Core
 
         public List<KeyValuePair<DateTime, double>> GetData(int count, string tradingPair)
         {
-            CreateConnection();
 
             ForexData forexData = _tradingServiceClient.GetData(count, tradingPair);
             List<KeyValuePair<DateTime, double>> list = new List<KeyValuePair<DateTime, double>>();
@@ -94,8 +93,6 @@ namespace ForexTrading.Core
             {
                 list.Add(new KeyValuePair<DateTime, double>(new DateTime(item.Key, DateTimeKind.Utc), item.Value));
             }
-
-            proxy.Close();
             return list;
 
         }
@@ -107,12 +104,10 @@ namespace ForexTrading.Core
         /// <param name="password"></param>
         public void LoginUser(string email, string password)
         {
-            CreateConnection();
             if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
             {
                 UserEmail = email;
             }
-            proxy.Close();
         }
 
 
@@ -137,42 +132,37 @@ namespace ForexTrading.Core
 
         public List<string> GetAllTradingPairs()
         {
-            CreateConnection();
             List<string> foo = _tradingServiceClient.GetAllTradingPairs();
-            proxy.Close();
             return foo;
         }
 
-        public void AddAsset(string tradingPair, DateTime timeOfBuy)
+        public void AddAsset(string tradingPair, DateTime timeOfBuy, double investment)
         {
-            CreateConnection();
-            _tradingServiceClient.AddAsset(tradingPair, timeOfBuy.Ticks);
-            instanceContext.Close();
+            _tradingServiceClient.AddAsset(tradingPair, timeOfBuy.Ticks, investment);
         }
 
         public DateTime GetServerTime()
         {
-            CreateConnection();
             DateTime dateTime = new DateTime(_tradingServiceClient.GetServerTime(), DateTimeKind.Utc);
-            proxy.Close();
             return dateTime;
 
         }
 
-        public List<string[]> GetPortFolio()
+        public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
-            CreateConnection();
-            List<string[]> foo = _tradingServiceClient.GetPortFolio();
-            proxy.Close();
+            //Entity returns sometimes error with query, only sometimes with same data, thats weird
+            KeyValuePair<string[], List<string[]>> foo = new KeyValuePair<string[], List<string[]>>();
+            do
+            {
+                foo = _tradingServiceClient.GetPortFolio();
+            } while (foo.Key == null);
 
             return foo;
         }
 
         public double GetActualValue(string firstAssetName, string secondAssetName)
         {
-            CreateConnection();
             var foo = _tradingServiceClient.GetActualValue(firstAssetName, secondAssetName);
-            proxy.Close();
             return foo;
 
         }

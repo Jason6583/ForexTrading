@@ -25,6 +25,7 @@ namespace ForexTradingDatabase
         public User User { get; set; }
 
         public double Price { get; set; }
-       
+        public double Investment { get; set; }
+
     }
 }

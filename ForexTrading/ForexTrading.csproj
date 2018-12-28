@@ -93,6 +93,9 @@
     <Compile Include="Pages\ForexPage.xaml.cs">
       <DependentUpon>ForexPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\ForexPage_Pages\BuyAsset_Page.xaml.cs">
+      <DependentUpon>BuyAsset_Page.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ForexPage_Pages\History_Page.xaml.cs">
       <DependentUpon>History_Page.xaml</DependentUpon>
     </Compile>
@@ -120,6 +123,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Pages\ForexPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ForexPage_Pages\BuyAsset_Page.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
