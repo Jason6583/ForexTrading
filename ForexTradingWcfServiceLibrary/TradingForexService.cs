@@ -18,18 +18,23 @@ namespace ForexTradingWcfServiceLibrary
     {
         private ITradingForexClient _user;
         private string _selectedPair;
-        private static ForexTradingContext _forexTradingContext = new ForexTradingContext();
+        private static ForexTradingContext _forexTradingContext;
         private static DateTime _serverTime = new DateTime(2017, 1, 2, 8, 1, 0);
         private string _actualTradingPair = "EUR/USD";
         User _actualUser;
         Queue<string> logs;
         public TradingForexService()
         {
+            _forexTradingContext = new ForexTradingContext();
+            var pom = (from x in _forexTradingContext.Assets select x).ToList();
             System.Timers.Timer aTimer = new System.Timers.Timer();
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 500;
             aTimer.Enabled = true;
             logs = new Queue<string>();
+
+
+
         }
 
         public bool LoginUser(string email, string password)

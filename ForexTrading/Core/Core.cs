@@ -109,6 +109,7 @@ namespace ForexTrading.Core
             {
                 while (_tradingServiceClient == null)
                     ;
+
                 if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
                 {
                     UserEmail = email;

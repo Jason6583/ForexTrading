@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +11,17 @@ namespace ForexTradingDatabase
 {
     public class ForexTradingContext : DbContext
     {
-        public ForexTradingContext() : base("name=ForexTradingContext")
+        public ForexTradingContext() : base()
         {
+            //For other user they want to try this application with filled database
+            var databaseLocation = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.Parent.Parent.FullName + "\\Database\\ForexTradingDb.mdf";
+            Database.Connection.ConnectionString =
+                "Data Source=(LocalDB)\\MSSQLLocalDB;" +
+                $"AttachDbFilename={databaseLocation};" +
+                "Integrated Security=True;"+
+                "MultipleActiveResultSets=true";
+
+            var pom = (from x in Assets select x).ToList();
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
         }
 
