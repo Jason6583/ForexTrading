@@ -14,15 +14,31 @@ namespace ForexTradingDatabase
         public ForexTradingContext() : base()
         {
             //For other user they want to try this application with filled database
-            var databaseLocation = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.Parent.Parent.FullName + "\\Database\\ForexTradingDb.mdf";
-            Database.Connection.ConnectionString =
-                "Data Source=(LocalDB)\\MSSQLLocalDB;" +
-                $"AttachDbFilename={databaseLocation};" +
-                "Integrated Security=True;"+
-                "MultipleActiveResultSets=true";
+            var solutionDirectory = TryGetSolutionDirectoryInfo();
 
-            var pom = (from x in Assets select x).ToList();
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
+            if (solutionDirectory != null)
+            {
+                var databaseLocation = solutionDirectory.FullName + "\\Database\\ForexTradingDb.mdf";
+
+                Database.Connection.ConnectionString =
+                    "Data Source=(LocalDB)\\MSSQLLocalDB;" +
+                    $"AttachDbFilename={databaseLocation};" +
+                    "Integrated Security=True;" +
+                    "MultipleActiveResultSets=true";
+
+                var pom = (from x in Assets select x).ToList();
+                Database.SetInitializer<ForexTradingContext>(null);
+            }
+        }
+        public static DirectoryInfo TryGetSolutionDirectoryInfo(string currentPath = null)
+        {
+            var directory = new DirectoryInfo(
+                currentPath ?? Directory.GetCurrentDirectory());
+            while (directory != null && !directory.GetFiles("*.sln").Any())
+            {
+                directory = directory.Parent;
+            }
+            return directory;
         }
 
         public ForexTradingContext(string nameOrConnectionString) : base(nameOrConnectionString)
