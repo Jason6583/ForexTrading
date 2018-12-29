@@ -119,14 +119,5 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Content Include="Database\ForexTradingDb.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Database\ForexTradingDb_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>ForexTradingDb.mdf</DependentUpon>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
