@@ -26,9 +26,9 @@ namespace ForexTradingDatabase
                     "Integrated Security=True;" +
                     "MultipleActiveResultSets=true";
 
-                var pom = (from x in Assets select x).ToList();
-                Database.SetInitializer<ForexTradingContext>(null);
             }
+
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
         }
         public static DirectoryInfo TryGetSolutionDirectoryInfo(string currentPath = null)
         {

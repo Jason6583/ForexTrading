@@ -25,7 +25,8 @@ namespace ForexTrading
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-
+        //TODO: Loading pri nacitavani
+        //TODO: Historia
         //Pages
         public Login_Page Login_Page { get; }
         public Register_Page Register_Page { get; }

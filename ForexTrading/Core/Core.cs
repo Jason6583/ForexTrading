@@ -105,16 +105,32 @@ namespace ForexTrading.Core
         /// <param name="password"></param>
         public void LoginUser(string email, string password)
         {
-            Task.Run(() =>
-            {
-                while (_tradingServiceClient == null)
-                    ;
 
-                if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+            while (_tradingServiceClient == null)
+                ;
+            while (true)
+            {
+                try
                 {
-                    UserEmail = email;
+                    if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+                    {
+                        UserEmail = email;
+                        break;
+                    }
                 }
-            });
+                catch (Exception)
+                {
+                    _client = new Client();
+                    instanceContext = new InstanceContext(_client);
+
+                    CreateConnection();
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(
+                        (obj) =>
+                        {
+                            _tradingServiceClient = proxy.CreateChannel();
+                        }));
+                }
+            }
         }
 
 
