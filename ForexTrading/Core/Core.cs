@@ -120,10 +120,7 @@ namespace ForexTrading.Core
                 }
                 catch (Exception)
                 {
-                    _client = new Client();
-                    instanceContext = new InstanceContext(_client);
 
-                    CreateConnection();
                     ThreadPool.QueueUserWorkItem(new WaitCallback(
                         (obj) =>
                         {
