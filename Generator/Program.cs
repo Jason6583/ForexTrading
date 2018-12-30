@@ -16,20 +16,6 @@ namespace Generator
         {
             forexTradingContex = new ForexTradingContext();
 
-            // forexTradingContex.Database.ExecuteSqlCommand("TRUNCATE TABLE [TradingPairs]");
-            // forexTradingContex.SaveChanges();
-
-            //var user = new TradingPair { Id = 1 };
-
-            //using (var context = new ForexTradingContext())
-            //{
-            //    Note: Attatch to the entity:
-            //    context.TraidingPairs.Attach(user);
-
-            //    context.TraidingPairs.Remove(user);
-            //    context.SaveChanges();
-            //}
-
            AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_EURGBP_M1_2017.csv", "EUR", "GBP");
 
 

@@ -54,7 +54,7 @@ namespace ForexTrading
             InitializeComponent();
 
             Core = new Core.Core();
-            Core.LoginUser("pecho4@gmail.com", "1111");
+            //Core.LoginUser("pecho4@gmail.com", "1111");
 
             //Iniciliazing pages
             Login_Page = new Login_Page(this);
@@ -66,7 +66,7 @@ namespace ForexTrading
             Frame.NavigationUIVisibility = NavigationUIVisibility.Hidden;
             Grid_Main.Children.Add(Frame);
 
-            Frame.Content = Forex_Page;
+            Frame.Content = Login_Page;
 
             Width = 1000;
             Height = 600;

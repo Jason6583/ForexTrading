@@ -27,10 +27,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForextTradingWCFServer", "ForextTradingWCFServer\ForextTradingWCFServer.csproj", "{9C3566E8-0253-458B-8B86-E57B93B025A9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{CF50E98C-7EF5-4753-AA81-04941EC8D915}"
-	ProjectSection(SolutionItems) = preProject
-		Database\ForexTradingDb.mdf = Database\ForexTradingDb.mdf
-		Database\ForexTradingDb_log.ldf = Database\ForexTradingDb_log.ldf
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
