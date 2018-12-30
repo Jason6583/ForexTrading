@@ -149,7 +149,7 @@ namespace ForexTrading.Pages
             InitializeComponent();
             _core = core;
             DataContext = this;
-            DataCount = 200;
+            DataCount = 500;
             UserEmail = core.UserEmail;
 
             //Initializing headers for side menu

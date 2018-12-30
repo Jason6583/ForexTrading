@@ -19,7 +19,7 @@ namespace ForexTradingWcfServiceLibrary
         private ITradingForexClient _user;
         private string _selectedPair;
         private static ForexTradingContext _forexTradingContext;
-        private static DateTime _serverTime = new DateTime(2017, 1, 2, 8, 1, 0);
+        private static DateTime _serverTime = new DateTime(2017, 1, 2, 11, 1, 0);
         private TradingPair _actualTradingPair;
         User _actualUser;
         Queue<string> logs;
