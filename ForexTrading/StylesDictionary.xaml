@@ -40,18 +40,19 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
 
-                <TextBlock Margin="5,0,0,0" Style="{DynamicResource ClassicTextBlockStyle}" TextAlignment="Left" Grid.Column="0">
+                <TextBlock Margin="10,5,10,5" Style="{DynamicResource ClassicTextBlockStyle}" TextAlignment="Left" Grid.Column="0">
                 <Run Text="{Binding [0]}" Foreground="{DynamicResource GrayBlackLighterer}"/>
                 <LineBreak/>
-                <Run Text="{Binding [1]}" Foreground="{DynamicResource GrayBlackLighterer}"/>
+                <Run Text="{Binding [1]}" Foreground="{DynamicResource LightLighter}"/>
                 </TextBlock>
 
 
-                <TextBlock Margin="5,0,0,0"
+                <TextBlock Margin="10,5,10,5"
                        Style="{DynamicResource ClassicTextBlockStyle}"  
                        TextAlignment="Left" 
                        Grid.Column="1">
@@ -64,7 +65,20 @@
 
                 </TextBlock>
 
-                <Grid Grid.Column="2">
+                <TextBlock Margin="10,5,10,5"
+                           Style="{DynamicResource ClassicTextBlockStyle}"  
+                           TextAlignment="Left" 
+                           Grid.Column="2">
+                    <Run Text="Investment" Foreground="{DynamicResource GrayBlackLighterer}"
+                         x:Name="Investment"/>
+                    <LineBreak/>
+                    <Run Text="{Binding [4]}" 
+                         FontSize="15"
+                         Foreground="{DynamicResource LightLighter}"/>
+
+                </TextBlock>
+
+                <Grid Grid.Column="3" Margin="10,5,10,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
@@ -74,7 +88,7 @@
                        Style="{DynamicResource ClassicTextBlockStyle}" 
                        TextAlignment="Right" 
                        Grid.Row="0" >
-                <Run Text="{Binding [4], StringFormat={}{0} €}" 
+                <Run Text="{Binding [5], StringFormat={}{0} €}" 
                      FontSize="15"
                      >
                     <Run.Foreground>
@@ -85,7 +99,7 @@
                     </Run.Foreground>
                 </Run>
                     <LineBreak/>
-                 <Run Text="{Binding [5], StringFormat={}{0} %}" 
+                 <Run Text="{Binding [6], StringFormat={}{0} %}" 
                          FontSize="15">
                         <Run.Foreground>
                             <MultiBinding Converter="{local:IsLessThanConverter}">
@@ -103,7 +117,82 @@
                        Grid.Row="1" 
                        HorizontalAlignment="Center"
                        FontSize="12"
-                       Margin="0,10,0,0"/>
+                       Margin="0,10,0,0" MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                       Tag="{Binding [7]}"
+                       />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="HistoryAssetsTeplate">
+        <Grid Style="{DynamicResource ActiveAssetGridStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <TextBlock Margin="10,5,10,5" Style="{DynamicResource ClassicTextBlockStyle}" TextAlignment="Left" Grid.Column="0">
+                <Run Text="{Binding [0]}" Foreground="{DynamicResource GrayBlackLighterer}"/>
+                <LineBreak/>
+                <Run Text="{Binding [1]}" Foreground="{DynamicResource LightLighter}"/>
+                </TextBlock>
+
+
+                <TextBlock Margin="10,5,10,5"
+                       Style="{DynamicResource ClassicTextBlockStyle}"  
+                       TextAlignment="Left" 
+                       Grid.Column="1">
+                <Run Text="{Binding [2]}" Foreground="{DynamicResource GrayBlackLighterer}"
+                     x:Name="TradingPair"/>
+                <LineBreak/>
+                <Run Text="{Binding [3]}" 
+                     FontSize="15"
+                     Foreground="{DynamicResource LightLighter}"/>
+
+                </TextBlock>
+
+                <TextBlock Margin="10,5,10,5"
+                           Style="{DynamicResource ClassicTextBlockStyle}"  
+                           TextAlignment="Left" 
+                           Grid.Column="2">
+                    <Run Text="Investment" Foreground="{DynamicResource GrayBlackLighterer}"
+                         x:Name="Investment"/>
+                    <LineBreak/>
+                    <Run Text="{Binding [4]}" 
+                         FontSize="15"
+                         Foreground="{DynamicResource LightLighter}"/>
+
+                </TextBlock>
+
+                <Grid Grid.Column="3" Margin="10,5,10,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                       Style="{DynamicResource ClassicTextBlockStyle}" 
+                       TextAlignment="Right" 
+                       Grid.Row="0" >
+                <Run Text="{Binding [5], StringFormat={}{0} €}" 
+                     FontSize="15"
+                     Foreground="{Binding [5], Converter={local:TotalSumConverter}}"
+                     >
+                </Run>
+                    <LineBreak/>
+                 <Run Text="{Binding [6], StringFormat={}{0} %}" 
+                         FontSize="15" Foreground="{Binding [5], Converter={local:TotalSumConverter}}">
+                    </Run>
+                    </TextBlock>
+                </Grid>
+            </Grid>
         </Grid>
     </DataTemplate>
 
@@ -138,7 +227,7 @@
                        TextAlignment="Right" 
                         Grid.Row="0" 
                         HorizontalAlignment="Right"
-                         FontSize="25"
+                         FontSize="20"
                        >
                         <Run Text="{Binding [2], StringFormat={}{0} €}" 
                              Foreground="{Binding [2], Converter={local:TotalSumConverter}}"/>

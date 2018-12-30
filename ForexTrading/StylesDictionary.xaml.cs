@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 using ForexTrading.Properties;
+using ForexTrading.Windows;
 
 
 namespace ForexTrading
@@ -72,6 +73,12 @@ namespace ForexTrading
                 _acutalMenuItem = null;
             }
         }
+
+        private void TextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var id = ((TextBlock)sender).Tag;
+            _mainWindow.Core.SellAsset(Convert.ToInt32(id));
+        }
     }
     #endregion
     public sealed class IsLessThanConverter : MarkupExtension, IMultiValueConverter
@@ -83,8 +90,7 @@ namespace ForexTrading
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var tradingPair = ((string)values[0]).Split('/');
-            if (System.Convert.ToDouble(((string)values[1]).Replace('.', ',')) > StylesDictionary._mainWindow.Core.GetActualValue(tradingPair[0], tradingPair[1]))
+            if (System.Convert.ToDouble(((string)values[1]).Replace('.', ',')) > StylesDictionary._mainWindow.Core.GetActualValue((string)values[0]))
                 return StylesDictionary._mainWindow.FindResource("Red") as SolidColorBrush;
             else
                 return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
@@ -101,10 +107,15 @@ namespace ForexTrading
         public object Convert(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
-            if (System.Convert.ToDouble(((string)value).Replace('.', ',')) > 0)
-                return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
-            else
-                return StylesDictionary._mainWindow.FindResource("Red") as SolidColorBrush;
+            if (value != null)
+            {
+                if (System.Convert.ToDouble(((string)value).Replace('.', ',')) > 0)
+                    return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
+                else
+                    return StylesDictionary._mainWindow.FindResource("Red") as SolidColorBrush;
+            }
+
+            return Brushes.Transparent;
         }
 
         public object ConvertBack(object value, Type targetType,

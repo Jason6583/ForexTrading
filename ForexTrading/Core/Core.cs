@@ -171,6 +171,14 @@ namespace ForexTrading.Core
             _tradingServiceClient.AddAsset(tradingPair, timeOfBuy.Ticks, investment);
         }
 
+        public delegate void SoldAssetEventHandler(object source, EventArgs args);
+        public event SoldAssetEventHandler SoldAssetEvent;
+        public void SellAsset(int id)
+        {
+            _tradingServiceClient.SellAsset(id);
+            CustomMessageBox.Show("Asset was sucessfully sold");
+            OnSoldAssetEvent(this);
+        }
         public DateTime GetServerTime()
         {
             DateTime dateTime = new DateTime(_tradingServiceClient.GetServerTime(), DateTimeKind.Utc);
@@ -189,11 +197,26 @@ namespace ForexTrading.Core
             return foo;
         }
 
-        public double GetActualValue(string firstAssetName, string secondAssetName)
+        public KeyValuePair<string[], List<string[]>> GetPortFolioHistory()
         {
-            var foo = _tradingServiceClient.GetActualValue(firstAssetName, secondAssetName);
+            //Entity returns sometimes error with query, only sometimes with same data, thats weird
+            KeyValuePair<string[], List<string[]>> foo = new KeyValuePair<string[], List<string[]>>();
+
+            foo = _tradingServiceClient.GetPortFolioHistory();
+
+            return foo;
+        }
+
+        public double GetActualValue(string traidinPair)
+        {
+            var foo = _tradingServiceClient.GetActualValue(traidinPair);
             return foo;
 
+        }
+
+        protected virtual void OnSoldAssetEvent(object source)
+        {
+            SoldAssetEvent?.Invoke(source, EventArgs.Empty);
         }
     }
 }

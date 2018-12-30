@@ -13,7 +13,6 @@ namespace ForexTradingDatabase
 
         public User()
         {
-            PortFolio = new List<PortFolioData>();
         }
 
         public User(string email, string name, string sureName, string password)
@@ -22,7 +21,6 @@ namespace ForexTradingDatabase
             Name = name;
             SureName = sureName;
             Password = password;
-            PortFolio = new List<PortFolioData>();
         }
 
         [Key]
@@ -30,7 +28,6 @@ namespace ForexTradingDatabase
         public string Name { get; set; }
         public string SureName { get; set; }
         public string Password { get; set; }
-        public List<PortFolioData> PortFolio { get; set; }
        
     }
 }

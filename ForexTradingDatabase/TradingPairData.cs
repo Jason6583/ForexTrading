@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace ForexTradingDatabase
 {
     [Serializable]
-    public class TraidingPairData
+    public class TradingPairData
     {
-        public TraidingPairData()
+        public TradingPairData()
         {
         }
 
 
         [Key]
         public int Id { get; set; }
-        public int TradingPairId { get; set; }
+        public TradingPair TradingPair { get; set; }
         public DateTime Date { get; set; }
         public double Value { get; set; }
     }

@@ -53,7 +53,7 @@ namespace ForexTrading.Pages
 
         private BuyAsset_Page _buyAsset_Page;
         private TotalPortfolio_Page _totalPortfolio_Page;
-        private History_Page _historyPage_Page;
+        private History_Page _history_Page;
 
         bool _isSideMenuUp;
         bool _isTraidingPairsMenuUp;
@@ -172,7 +172,7 @@ namespace ForexTrading.Pages
             //Inicializing pages
 
             _buyAsset_Page = new BuyAsset_Page(core);
-            _historyPage_Page = new History_Page();
+            _history_Page = new History_Page();
             //Intializing datasources for chart
 
             EurUsD = new ObservableCollection<KeyValuePair<DateTime, double>>();
@@ -180,11 +180,16 @@ namespace ForexTrading.Pages
             LoadTradingPairs();
 
             _core.Client.ReceiveDataEvent += Client_ReceiveDataEvent;
+            _core.SoldAssetEvent += _core_SoldAssetEvent;
 
             _totalPortfolio_Page = new TotalPortfolio_Page();
-
-
         }
+
+        private void _core_SoldAssetEvent(object source, EventArgs args)
+        {
+            _history_Page.LoadHistory(_core.GetPortFolioHistory());
+        }
+
         private void Client_ReceiveDataEvent(object source, Core.Client.ReceiveDataArgs args)
         {
             if (args.Name == ActualTradingPair)
@@ -197,9 +202,9 @@ namespace ForexTrading.Pages
 
             if (_isSideMenuUp)
                 Task.Run(() =>
-                 {
-                     _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
-                 });
+                {
+                    _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
+                });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -335,6 +340,7 @@ namespace ForexTrading.Pages
             {
                 ActualTradingPair = ((TextBlock)sender).Text;
                 EurUsdChart.Clear();
+
                 var forexData = _core.GetData(DataCount, ActualTradingPair);
                 EurUsdChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(forexData));
             }
@@ -376,7 +382,7 @@ namespace ForexTrading.Pages
                     ChangeSizeOfSideMenu(SideMenuItem.History);
 
                     _acutalSideMenuItem = SideMenu_History;
-                    Frame_Menu.Content = _historyPage_Page;
+                    Frame_Menu.Content = _history_Page;
                     break;
                 case SideMenuItem.BuyAsset:
 
@@ -417,12 +423,15 @@ namespace ForexTrading.Pages
             if (!_isSideMenuUp)
             {
                 SwitchMenu(SideMenuItem.History);
-                ShowSideMenu(_widhtOfSideMenu);
+                ShowSideMenu(_widhtOfActivePortfolio);
             }
             else
             {
                 SwitchMenu(SideMenuItem.History);
             }
+
+            Task.Run(() => { _history_Page.LoadHistory(_core.GetPortFolioHistory()); });
+
         }
         private void SideMenu_BuyAsset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -439,19 +448,23 @@ namespace ForexTrading.Pages
 
 
         private double _widhtOfSideMenu = 150;
-        private double _widhtOfActivePortfolio = 250;
+        private double _widhtOfActivePortfolio = 350;
 
         private void ChangeSizeOfSideMenu(SideMenuItem sideMenuItem)
         {
-            if (sideMenuItem == SideMenuItem.ActivePortfolio)
+            if (sideMenuItem == SideMenuItem.ActivePortfolio || sideMenuItem == SideMenuItem.History)
             {
-                DoubleAnimation da = new DoubleAnimation(_widhtOfSideMenu, _widhtOfActivePortfolio, TimeSpan.FromMilliseconds(500));
-                da.Completed += Da_Completed;
+                if (_acutalSideMenuItem != SideMenu_ActivePortfolio && _acutalSideMenuItem != SideMenu_History)
+                {
+                    DoubleAnimation da = new DoubleAnimation(_widhtOfSideMenu, _widhtOfActivePortfolio,
+                        TimeSpan.FromMilliseconds(500));
+                    da.Completed += Da_Completed;
 
-                Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
-                _isSideMenuUp = true;
+                    Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
+                    _isSideMenuUp = true;
+                }
             }
-            else if (_acutalSideMenuItem == SideMenu_ActivePortfolio)
+            else
             {
                 DoubleAnimation da = new DoubleAnimation(_widhtOfActivePortfolio, _widhtOfSideMenu, TimeSpan.FromMilliseconds(500));
                 da.Completed += Da_Completed;

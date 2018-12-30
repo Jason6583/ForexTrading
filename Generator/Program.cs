@@ -30,7 +30,7 @@ namespace Generator
             //    context.SaveChanges();
             //}
 
-           //AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_EURGBP_M1_2017.csv", "EUR", "GBP");
+           AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_EURGBP_M1_2017.csv", "EUR", "GBP");
 
 
         }
@@ -44,12 +44,12 @@ namespace Generator
             return asset;
         }
 
-        public static void AddTradingPair(Asset idFIrst, Asset idSecond)
+        public static void AddTradingPair(string idFIrst, string idSecond)
         {
             forexTradingContex.TraidingPairs.Add(new TradingPair()
             {
-                FirstAsset = idFIrst,
-                SecondAsset = idSecond
+                FirstAssetName = idFIrst,
+                SecondAssetName = idSecond
             });
             forexTradingContex.SaveChanges();
         }
@@ -63,13 +63,13 @@ namespace Generator
             var asset1 = (from x in forexTradingContex.Assets where x.Name == "EUR" select x).SingleOrDefault();
             //var asset2 = (from x in forexTradingContex.Assets where x.Name == "USD" select x).SingleOrDefault();
 
-            AddTradingPair(asset1, second);
+            AddTradingPair(idFirst, idSecond);
 
             int i = 0;
             TradingPair tradingPair =
                 (from x in forexTradingContex.TraidingPairs
-                 where x.FirstAsset.Name == idFirst
-                 where x.SecondAsset.Name == idSecond
+                 where x.FirstAssetName == idFirst
+                 where x.SecondAssetName == idSecond
                  select x).ToList()[0];
 
             StreamReader streamReader = new StreamReader(nameOfFIle);
@@ -86,7 +86,7 @@ namespace Generator
                 TraidingPairData traidingPairData = new TraidingPairData()
                 {
                     Date = date,
-                    TradingPair = tradingPair,
+                    TradingPairId = tradingPair.Id,
                     Value = Convert.ToDouble(line[2].Replace('.', ','))
                 };
                 forexTradingContex.TraidingPairDatas.Add(traidingPairData);

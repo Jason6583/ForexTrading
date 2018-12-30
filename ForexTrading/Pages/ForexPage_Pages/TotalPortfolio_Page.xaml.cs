@@ -27,12 +27,7 @@ namespace ForexTrading.Pages.ForexPage_Pages
     public partial class TotalPortfolio_Page : Page, INotifyPropertyChanged
     {
         string[] _summaryStats;
-        public TotalPortfolio_Page()
-        {
-            InitializeComponent();
-            DataContext = this;
-        }
-
+        private List<ContentPresenter> contentPresenters = new List<ContentPresenter>();
         public string[] SummaryStats
         {
             get { return _summaryStats; }
@@ -42,33 +37,52 @@ namespace ForexTrading.Pages.ForexPage_Pages
                 OnPropertyChanged("SummaryStats");
             }
         }
+        public TotalPortfolio_Page()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
 
-        private List<ContentPresenter> contentPresenters = new List<ContentPresenter>();
+
+
+
 
 
         public void LoadPortfolio(KeyValuePair<string[], List<string[]>> portofolioData)
         {
-            if (portofolioData.Key != null)
+            Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() =>
+                if (portofolioData.Key != null)
                 {
                     //Parameters have to be invoked by Task.run
+
                     SummaryStats = portofolioData.Key;
+
+                    //if asset was removed
+                    while (contentPresenters.Count > portofolioData.Value.Count)
+                    {
+                        var contentePresenter = contentPresenters[contentPresenters.Count - 1];
+                        contentPresenters.Remove(contentePresenter);
+                        StackPanel_PortFolio.Children.Remove(contentePresenter);
+                        //Remove separator
+                        StackPanel_PortFolio.Children.RemoveAt(StackPanel_PortFolio.Children.Count - 1);
+                    }
+
+                    //If new asset was added
                     while (contentPresenters.Count < portofolioData.Value.Count)
                     {
                         ContentPresenter contentPresenter = new ContentPresenter();
                         contentPresenter.ContentTemplate = FindResource("ActiveAssetsTemplate") as DataTemplate;
-                        contentPresenter.Margin = new Thickness(5);
 
-                        Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(contentPresenter); });
+                        StackPanel_PortFolio.Children.Add(contentPresenter);
 
                         Separator separator = new Separator()
                         {
                             Margin = new Thickness(10, 5, 10, 5),
-                            Background = (SolidColorBrush) (new BrushConverter().ConvertFrom("#AF252525"))
+                            Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#AF252525"))
                         };
 
-                        Dispatcher.Invoke(() => { StackPanel_PortFolio.Children.Add(separator); });
+                        StackPanel_PortFolio.Children.Add(separator);
                         contentPresenters.Add(contentPresenter);
                     }
 
@@ -78,8 +92,15 @@ namespace ForexTrading.Pages.ForexPage_Pages
                         (contentPresenters[i]).Content = item;
                         i++;
                     }
-                });
-            }
+
+                }
+                else if (contentPresenters.Count != 0)
+                {
+                    contentPresenters.Clear();
+                    StackPanel_PortFolio.Children.Clear();
+                    SummaryStats = new string[6];
+                }
+            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
