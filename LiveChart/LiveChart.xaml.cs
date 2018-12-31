@@ -1134,8 +1134,8 @@ namespace LiveChart
             if (diffrenceWidth != 1 || diffrenceHeight != 1)
             {
 
-                _shift = width1 / Convert.ToDouble(DataCount);
-                _maxRenderingPoint = (_shift * Convert.ToDouble(DataCount)) * 0.8;
+               
+                
 
                 //Line
                 foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)
@@ -1147,18 +1147,16 @@ namespace LiveChart
                     lineSegment.BeginAnimation(LineSegment.PointProperty, null);
                     lineSegment.Point = new Point(x, y);
 
-                    if (lineSegment == _pathFigureOfMainLine.Segments.Last())
-                        ;
                 }
 
                 if (edge)
                 {
                     ShiftXVisibleField(_shift);
                 }
-
+                _shift = width1 / Convert.ToDouble(DataCount);
                 //Body
 
-
+                _maxRenderingPoint = (_shift * Convert.ToDouble(DataCount)) * 0.8;
                 _bottomOfChart = height1;
                 _xValue = _xValue * diffrenceWidth;
 
