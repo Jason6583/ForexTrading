@@ -64,8 +64,7 @@ namespace ForexTrading.Core
         {
             _client = new Client();
             instanceContext = new InstanceContext(_client);
-
-            CreateConnection();
+            proxy = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
             ThreadPool.QueueUserWorkItem(new WaitCallback(
                 (obj) =>
                 {
@@ -74,17 +73,22 @@ namespace ForexTrading.Core
 
         }
         private static DuplexChannelFactory<ITradingForexService> proxy;
-        public void CreateConnection()
-        {
-            proxy = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
-        }
 
+        /// <summary>
+        /// Close connetion with service
+        /// </summary>
         public void CloseConnection()
         {
             proxy.Close();
             instanceContext = null;
         }
 
+        /// <summary>
+        /// Gets data from database
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="tradingPair"></param>
+        /// <returns></returns>
         public List<KeyValuePair<DateTime, double>> GetData(int count, string tradingPair)
         {
 
@@ -108,24 +112,33 @@ namespace ForexTrading.Core
 
             while (_tradingServiceClient == null)
                 ;
+
             while (true)
             {
                 try
                 {
-                    if (_tradingServiceClient.LoginUser("pecho4@gmail.com", "1111"))
+                    if (_tradingServiceClient.LoginUser(email,password))
                     {
                         UserEmail = email;
                         break;
                     }
+                    else
+                    {
+                        throw new ArgumentException("Wrong email or password");
+                    }
                 }
-                catch (Exception)
+                catch (ArgumentException ex)
                 {
-
+                    throw;
+                }
+                catch (EndpointNotFoundException )
+                {
+                    throw new EndpointNotFoundException("Server is currently offline");
+                }
+                catch (Exception ex)
+                {
                     ThreadPool.QueueUserWorkItem(new WaitCallback(
-                        (obj) =>
-                        {
-                            _tradingServiceClient = proxy.CreateChannel();
-                        }));
+                        (obj) => { _tradingServiceClient = proxy.CreateChannel(); }));
                 }
             }
         }
@@ -149,7 +162,10 @@ namespace ForexTrading.Core
                 throw;
             }
         }
-
+        /// <summary>
+        /// Returns all trading pairs
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetAllTradingPairs()
         {
             List<string> foo = null;
@@ -165,7 +181,12 @@ namespace ForexTrading.Core
 
             return foo;
         }
-
+        /// <summary>
+        /// Add asset for user
+        /// </summary>
+        /// <param name="tradingPair"></param>
+        /// <param name="timeOfBuy"></param>
+        /// <param name="investment"></param>
         public void AddAsset(string tradingPair, DateTime timeOfBuy, double investment)
         {
             _tradingServiceClient.AddAsset(tradingPair, timeOfBuy.Ticks, investment);
@@ -173,19 +194,31 @@ namespace ForexTrading.Core
 
         public delegate void SoldAssetEventHandler(object source, EventArgs args);
         public event SoldAssetEventHandler SoldAssetEvent;
+        /// <summary>
+        /// Make asset as sold for user
+        /// </summary>
+        /// <param name="id"></param>
         public void SellAsset(int id)
         {
             _tradingServiceClient.SellAsset(id);
             CustomMessageBox.Show("Asset was sucessfully sold");
             OnSoldAssetEvent(this);
         }
+
+        /// <summary>
+        /// Returns sever time
+        /// </summary>
+        /// <returns></returns>
         public DateTime GetServerTime()
         {
             DateTime dateTime = new DateTime(_tradingServiceClient.GetServerTime(), DateTimeKind.Utc);
             return dateTime;
 
         }
-
+        /// <summary>
+        /// Return active assets
+        /// </summary>
+        /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
             //Entity returns sometimes error with query, only sometimes with same data, thats weird
@@ -196,7 +229,10 @@ namespace ForexTrading.Core
 
             return foo;
         }
-
+        /// <summary>
+        /// Returns sold assets
+        /// </summary>
+        /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolioHistory()
         {
             //Entity returns sometimes error with query, only sometimes with same data, thats weird
@@ -206,14 +242,21 @@ namespace ForexTrading.Core
 
             return foo;
         }
-
+        /// <summary>
+        /// Returns actual value of trading pair
+        /// </summary>
+        /// <param name="traidinPair"></param>
+        /// <returns></returns>
         public double GetActualValue(string traidinPair)
         {
             var foo = _tradingServiceClient.GetActualValue(traidinPair);
             return foo;
 
         }
-
+        /// <summary>
+        /// Invoker for Sold event
+        /// </summary>
+        /// <param name="source"></param>
         protected virtual void OnSoldAssetEvent(object source)
         {
             SoldAssetEvent?.Invoke(source, EventArgs.Empty);

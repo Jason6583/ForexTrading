@@ -28,60 +28,45 @@ namespace ForexTrading
         //TODO: Loading pri nacitavani
         //TODO: Historia
         //Pages
-        public Login_Page Login_Page { get; }
-        public Register_Page Register_Page { get; }
-        public ForexPage Forex_Page { get; }
+        private Login_Page Login_Page;
+        private Register_Page Register_Page;
+        private ForexPage Forex_Page;
 
         //Button context for minimize and maximize
         private string _isMaxed = "[ ]";
         public Core.Core Core { get; }
-        public Frame Frame { get; }
         public string WindowTitle { get; set; }
-        ObservableCollection<KeyValuePair<DateTime, double>> _list;
 
-        public ObservableCollection<KeyValuePair<DateTime, double>> List
+        private string _otherPage;
+        public string OtherPage
         {
-            get => _list;
+            get { return _otherPage; }
             set
             {
-                OnPropertyChanged("List");
-                _list = value;
+                _otherPage = value;
+                OnPropertyChanged(nameof(OtherPage));
             }
         }
 
         public MainWindow()
         {
             InitializeComponent();
-
+            DataContext = this;
             Core = new Core.Core();
             Core.LoginUser("pecho4@gmail.com", "1111");
 
             //Iniciliazing pages
             Login_Page = new Login_Page(this);
             Register_Page = new Register_Page(this);
-            Forex_Page = new ForexPage(Core);
+          
 
             //Iniciliazing frame
-            Frame = new Frame();
-            Frame.NavigationUIVisibility = NavigationUIVisibility.Hidden;
-            Grid_Main.Children.Add(Frame);
-
-            Frame.Content = Forex_Page;
-
-            Width = 1000;
-            Height = 600;
-
-            DataContext = this;
+            //ShowLoginPage();
+            ShowForexPage();
             WindowTitle = "Trading forex";
 
-            InitializeComponent();
-            DataContext = this;
-
-            List = new ObservableCollection<KeyValuePair<DateTime, double>>();
-
-            
         }
-        
+
         public string IsMaxed
         {
             get { return _isMaxed; }
@@ -91,7 +76,29 @@ namespace ForexTrading
                 OnPropertyChanged("IsMaxed");
             }
         }
-        
+
+
+        public void ShowLoginPage()
+        {
+            OtherPage = "Register";
+            Frame_Main.Content = Login_Page;
+        }
+
+        public void ShowForexPage()
+        {
+            Forex_Page = new ForexPage(Core);
+            Grid_Main.Children.Remove(TextBlock_OtherPage);
+            Grid_Main.RowDefinitions.RemoveAt(0);
+            Frame_Main.Content = Forex_Page;
+           
+        }
+
+        public void ShowRegisterPage()
+        {
+            OtherPage = "Log in";
+            Frame_Main.Content = Register_Page;
+        }
+
         /// <summary>
         /// Method for changing icon for window state
         /// </summary>
@@ -120,6 +127,14 @@ namespace ForexTrading
         private void Window_Closed(object sender, EventArgs e)
         {
             Core.CloseConnection();
+        }
+
+        private void OtherPage_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (OtherPage == "Register")
+                ShowRegisterPage();
+            else if(OtherPage == "Log in")
+                ShowLoginPage();
         }
     }
 }

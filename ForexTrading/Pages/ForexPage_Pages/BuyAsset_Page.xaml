@@ -37,7 +37,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Style="{StaticResource TextBoxStyle}" 
+                <TextBox 
                          Grid.Column="0"
                          x:Name="TextBox_Investment" 
                          Width="{Binding ElementName=ComboBox_TradingPair, Path=ActualWidth}" 

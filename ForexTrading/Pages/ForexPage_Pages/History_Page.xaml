@@ -31,7 +31,6 @@
 
                 </StackPanel>
             </ScrollViewer>
-
         </Grid>
     </Border>
 </Page>

@@ -234,18 +234,14 @@ namespace ForexTrading.Pages
         double _menuHeight = 100;
         private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (!_isTraidingPairsMenuUp)
-            {
-                DoubleAnimation da = new DoubleAnimation(0, _menuHeight, TimeSpan.FromMilliseconds(300));
-                Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
-                _isTraidingPairsMenuUp = true;
-            }
-            else
-            {
-                DoubleAnimation da = new DoubleAnimation(_menuHeight, 0.0, TimeSpan.FromMilliseconds(300));
-                Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
-                _isTraidingPairsMenuUp = false;
-            }
+
+            DoubleAnimation da = new DoubleAnimation(0, _menuHeight, TimeSpan.FromMilliseconds(300));
+            Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
+            _isTraidingPairsMenuUp = true;
+
+            Border_TradingPairs.BorderThickness = new Thickness(2);
+
+
         }
 
         private void TextBlock_MouseLeave(object sender, MouseEventArgs e)
@@ -255,6 +251,8 @@ namespace ForexTrading.Pages
                 DoubleAnimation da = new DoubleAnimation(_menuHeight, 0.0, TimeSpan.FromMilliseconds(300));
                 Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
                 _isTraidingPairsMenuUp = false;
+
+                Border_TradingPairs.BorderThickness = new Thickness(0);
             }
         }
 
@@ -263,6 +261,8 @@ namespace ForexTrading.Pages
             DoubleAnimation da = new DoubleAnimation(0, _menuHeight, TimeSpan.FromMilliseconds(0));
             Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
             _isTraidingPairsMenuUp = true;
+
+            Border_TradingPairs.BorderThickness = new Thickness(2);
         }
 
         private void Grid_TraidingPairs_MouseLeave(object sender, MouseEventArgs e)
@@ -272,6 +272,8 @@ namespace ForexTrading.Pages
                 DoubleAnimation da = new DoubleAnimation(_menuHeight, 0.0, TimeSpan.FromMilliseconds(300));
                 Grid_TraidingPairs.BeginAnimation(FrameworkElement.HeightProperty, da);
                 _isTraidingPairsMenuUp = false;
+
+                Border_TradingPairs.BorderThickness = new Thickness(0);
             }
         }
         /// <summary>
@@ -498,6 +500,16 @@ namespace ForexTrading.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MarginOfTradingPair = new Thickness(TextBlock_UserEmail.ActualWidth, 0, 0, 0);
+
+            var slideAnmiation = new ThicknessAnimation()
+            {
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500)),
+                From = new Thickness(this.WindowWidth, 0, -this.WindowWidth, 0),
+                To = new Thickness(0),
+                DecelerationRatio = 0.9f
+            };
+
+            this.BeginAnimation(MarginProperty, slideAnmiation);
         }
     }
 }

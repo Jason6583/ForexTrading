@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -27,6 +28,7 @@ namespace ForexTrading.Pages
         {
             InitializeComponent();
             _mainWindow = mainWindow;
+            DataContext = this;
         }
 
         /// <summary>
@@ -36,19 +38,22 @@ namespace ForexTrading.Pages
         /// <param name="e"></param>
         private void Button_Login_Click(object sender, RoutedEventArgs e)
         {
-            try
+
+            var email = TextBox_Login.Text;
+            var password = TextBox_Password.Password;
+
+            Task.Run(() =>
             {
-                _mainWindow.Core.LoginUser(TextBox_Login.Text, TextBox_Password.Password);
-
-                CustomMessageBox.Show("You have been successfully loged in");
-
-                _mainWindow.Frame.Content = _mainWindow.Forex_Page;
-
-            }
-            catch (Exception ex)
-            {
-                CustomMessageBox.Show(ex.Message);
-            }
+                try
+                {
+                    _mainWindow.Core.LoginUser(email, password);
+                    Dispatcher.Invoke(() => { _mainWindow.ShowForexPage(); });
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() => { CustomMessageBox.Show(ex.Message); });
+                }
+            });
         }
 
         /// <summary>
@@ -58,7 +63,35 @@ namespace ForexTrading.Pages
         /// <param name="e"></param>
         private void Button_Create_Click(object sender, RoutedEventArgs e)
         {
-            _mainWindow.Frame.Content = _mainWindow.Register_Page;
+            _mainWindow.ShowRegisterPage();
+        }
+
+        private void Login_Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Storyboard storyboard = new Storyboard();
+            var slideAnmiation = new ThicknessAnimation()
+            {
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, 800)),
+                From = new Thickness(this.WindowWidth, 0, -this.WindowWidth, 0),
+                To = new Thickness(0),
+                DecelerationRatio = 0.9f
+            };
+
+            var fadeAnmiation = new DoubleAnimation()
+            {
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, 800)),
+                From =  0,
+                To = 1,
+            };
+
+            Storyboard.SetTargetProperty(slideAnmiation, new PropertyPath(MarginProperty));
+            Storyboard.SetTargetProperty(fadeAnmiation, new PropertyPath(OpacityProperty));
+
+            storyboard.Children.Add(slideAnmiation);
+            storyboard.Children.Add(fadeAnmiation);
+            storyboard.Begin(this);
+
+            
         }
     }
 }

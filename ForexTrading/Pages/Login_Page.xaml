@@ -5,36 +5,35 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ForexTrading.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="Login_Page">
+      Title="Login_Page"
+      Width="400"
+      Height="450"
+      Loaded="Login_Page_Loaded"
+      >
 
-    <Page.Resources>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource ClassicTextBlockStyle}">
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Margin" Value="15"/>
-            <Setter Property="FontWeight" Value="UltraLight"/>
-        </Style>
-    </Page.Resources>
+    <Border CornerRadius="15" Background="#FF1B1B1B">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
 
-    <Grid >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
+            <TextBox x:Name="TextBox_Login" Grid.Row="1" 
+                 FontSize="20" 
+                 Margin="15"
+                 Width="300"
+                 Tag="Email" />
 
+            <PasswordBox x:Name="TextBox_Password" Grid.Row="2" 
+                     FontSize="20" Width="300"
+                     Tag="Password"
+                     Margin="15"
+                     />
 
-        <TextBlock Text="Email" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" />
-        <TextBox x:Name="TextBox_Login" Grid.Row="2"  Style="{StaticResource TextBoxStyle}" FontSize="15" Width="300"/>
-
-        <TextBlock Text="Password" Grid.Row="3"   HorizontalAlignment="Center" />
-        <PasswordBox x:Name="TextBox_Password" Grid.Row="4"   Style="{StaticResource PasswordBoxStyle}" FontSize="15" Width="300"/>
-
-        <TextBlock x:Name="Button_Login" 
-                Grid.Row="5" 
+            <TextBlock x:Name="Button_Login" 
+                Grid.Row="3" 
                 Text="Log in" Margin="15" 
                 Style="{StaticResource MenuTextBlockStyle}"
                 FontSize="30" 
@@ -42,16 +41,6 @@
                 HorizontalAlignment="Center"
                
                 />
-
-        <TextBlock x:Name="Button_Create" 
-                    Grid.Row="0" 
-                   Text="Create account" 
-                    Margin="5" 
-                    Style="{StaticResource MenuTextBlockStyle}"
-                    FontSize="12" 
-                   MouseLeftButtonDown="Button_Create_Click"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-            />
-    </Grid>
+        </Grid>
+    </Border>
 </Page>

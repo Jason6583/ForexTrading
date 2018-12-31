@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -48,7 +49,7 @@ namespace ForexTrading.Pages
 
                     CustomMessageBox.Show("You have been successfully registered");
 
-                    _mainWindow.Frame.Content = _mainWindow.Login_Page;
+                    _mainWindow.ShowLoginPage();
                 }
                 else
                     throw new ArgumentException("Not every information is filled");
@@ -67,7 +68,35 @@ namespace ForexTrading.Pages
         /// <param name="e"></param>
         private void Button_Login_Click(object sender, RoutedEventArgs e)
         {
-            _mainWindow.Frame.Content = _mainWindow.Login_Page;
+            _mainWindow.ShowLoginPage();
+        }
+
+        private void Register_Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Storyboard storyboard = new Storyboard();
+            var slideAnmiation = new ThicknessAnimation()
+            {
+                Duration = new Duration(new TimeSpan(0, 0, 0, 1, 200)),
+                From = new Thickness(this.WindowWidth, 0, -this.WindowWidth, 0),
+                To = new Thickness(0),
+                DecelerationRatio = 0.9f
+            };
+
+            var fadeAnmiation = new DoubleAnimation()
+            {
+                Duration = new Duration(new TimeSpan(0, 0, 0, 1, 200)),
+                From = 0,
+                To = 1,
+            };
+
+            Storyboard.SetTargetProperty(slideAnmiation, new PropertyPath(MarginProperty));
+            Storyboard.SetTargetProperty(fadeAnmiation, new PropertyPath(OpacityProperty));
+
+            storyboard.Children.Add(slideAnmiation);
+            storyboard.Children.Add(fadeAnmiation);
+            storyboard.Begin(this);
+
+            
         }
     }
 }

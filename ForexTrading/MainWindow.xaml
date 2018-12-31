@@ -6,16 +6,30 @@
         xmlns:local="clr-namespace:ForexTrading"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        AllowsTransparency="True" Style="{DynamicResource WindowStyle}" 
+        AllowsTransparency="True" 
+        Style="{DynamicResource WindowStyle}" 
         WindowStyle="None" 
         StateChanged="Window_StateChanged" 
         MinHeight="300"
         MinWidth="600"
-        Width="700"
-        Height="400" Closed="Window_Closed" Background="#FF060606"
-
+        Width="1000"
+        Height="600" 
+        Closed="Window_Closed" 
         >
 
-    <Grid x:Name="Grid_Main" />
+    <Grid x:Name="Grid_Main" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding OtherPage}" 
+                   Style="{StaticResource MenuTextBlockStyle}"
+                   Margin="10"
+                   FontSize="15"
+                   MouseLeftButtonDown="OtherPage_Click"
+                   x:Name="TextBlock_OtherPage"/>
+        <Frame x:Name="Frame_Main" NavigationUIVisibility="Hidden" Grid.Row="1"/>
+    </Grid>
+
 
 </Window>

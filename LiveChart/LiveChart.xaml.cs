@@ -865,14 +865,31 @@ namespace LiveChart
             hwndTarget.RenderMode = RenderMode.SoftwareOnly;
 
 
+
+         
             Dot.Effect = new DropShadowEffect
             {
                 Color = ((SolidColorBrush)DotColor).Color,
                 Direction = 45,
                 ShadowDepth = 0,
                 Opacity = 1,
-                BlurRadius = 5
             };
+
+            Storyboard storyboard1 = new Storyboard();
+            DoubleAnimation colorAnimation = new DoubleAnimation()
+            {
+                From = 10,
+                To = 0,
+                RepeatBehavior = RepeatBehavior.Forever,
+                AutoReverse = true
+            };
+
+            colorAnimation.BeginTime = TimeSpan.FromSeconds(1);
+            Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("Effect.BlurRadius"));
+            storyboard1.Children.Add(colorAnimation);
+
+            storyboard1.Begin(Dot);
+
 
             ActualValueText.Effect = new DropShadowEffect
             {

@@ -43,11 +43,6 @@ namespace ForexTrading.Pages.ForexPage_Pages
             DataContext = this;
         }
 
-
-
-
-
-
         public void LoadPortfolio(KeyValuePair<string[], List<string[]>> portofolioData)
         {
             Dispatcher.Invoke(() =>

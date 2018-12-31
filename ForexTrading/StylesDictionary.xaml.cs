@@ -129,6 +129,70 @@ namespace ForexTrading
             return this;
         }
     }
+
+
+    /// <summary>
+    /// Attached properties for passwordbox
+    /// </summary>
+    //Password box does not have Dependency property for Password
+    public class PasswordBoxProperties
+    {
+
+        public static readonly DependencyProperty MonitorPasswordProperty
+            = DependencyProperty.RegisterAttached(("MonitorPassword"), 
+                typeof(bool),
+                typeof(PasswordBoxProperties), 
+                new PropertyMetadata(false, OnMonitorPasswordChanged));
+
+        private static void OnMonitorPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var passwordBox = (PasswordBox) d;
+            
+            //remove old event
+            passwordBox.PasswordChanged -= PasswordBox_PasswordChanged;
+
+            if ((bool) e.NewValue)
+            {
+                SetHasText(passwordBox,false);
+                passwordBox.PasswordChanged += PasswordBox_PasswordChanged;
+            }
+        }
+        /// <summary>
+        /// Event why is typed in passwordbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            SetHasText((PasswordBox)sender, false);
+        }
+
+        public static void SetMonitorPassword(PasswordBox passwordBox, bool value)
+        {
+            passwordBox.SetValue(MonitorPasswordProperty, true);
+        }
+
+        public static bool GetMonitorPassword(PasswordBox passwordBox)
+        {
+            return (bool)passwordBox.GetValue(MonitorPasswordProperty);
+        }
+
+        public static readonly DependencyProperty HasTextProperty
+            = DependencyProperty.RegisterAttached(("HasText"), 
+                typeof(bool), 
+                typeof(PasswordBoxProperties), 
+                new PropertyMetadata(false));
+
+        public static void SetHasText(PasswordBox passwordBox, bool value)
+        {
+            passwordBox.SetValue(HasTextProperty, passwordBox.Password.Length > 0);
+        }
+
+        public static bool GetHasText(PasswordBox passwordBox)
+        {
+            return (bool)passwordBox.GetValue(HasTextProperty);
+        }
+    }
 }
 
 
