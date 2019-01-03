@@ -12,7 +12,7 @@
         StateChanged="Window_StateChanged" 
         MinHeight="300"
         MinWidth="600"
-        Width="1000"
+        Width="1200"
         Height="600" 
         Closed="Window_Closed" 
         >

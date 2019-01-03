@@ -22,9 +22,9 @@ using ForexTrading.Core;
 namespace ForexTrading.Pages.ForexPage_Pages
 {
     /// <summary>
-    /// Interaction logic for TotalPortfolio_Page.xaml
+    /// Page for showing active portfolio
     /// </summary>
-    public partial class TotalPortfolio_Page : Page, INotifyPropertyChanged
+    public partial class ActivePortfolio_Page : Page, INotifyPropertyChanged
     {
         string[] _summaryStats;
         private List<ContentPresenter> contentPresenters = new List<ContentPresenter>();
@@ -37,12 +37,18 @@ namespace ForexTrading.Pages.ForexPage_Pages
                 OnPropertyChanged("SummaryStats");
             }
         }
-        public TotalPortfolio_Page()
+        /// <summary>
+        /// Contructor for active portfolio
+        /// </summary>
+        public ActivePortfolio_Page()
         {
             InitializeComponent();
             DataContext = this;
         }
-
+        /// <summary>
+        /// Action when active portfolio is loaded
+        /// </summary>
+        /// <param name="portofolioData"></param>
         public void LoadPortfolio(KeyValuePair<string[], List<string[]>> portofolioData)
         {
             Dispatcher.Invoke(() =>

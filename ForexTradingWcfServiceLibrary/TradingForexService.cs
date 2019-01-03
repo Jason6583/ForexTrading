@@ -11,6 +11,9 @@ using ForexTradingDatabase;
 
 namespace ForexTradingWcfServiceLibrary
 {
+    /// <summary>
+    /// Trading service for server
+    /// </summary>
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple,
         InstanceContextMode = InstanceContextMode.Single,
         UseSynchronizationContext = false)]
@@ -23,6 +26,9 @@ namespace ForexTradingWcfServiceLibrary
         private TradingPair _actualTradingPair;
         User _actualUser;
         Queue<string> logs;
+        /// <summary>
+        /// Constructor for service
+        /// </summary>
         public TradingForexService()
         {
             _forexTradingContext = new ForexTradingContext();
@@ -33,7 +39,12 @@ namespace ForexTradingWcfServiceLibrary
             logs = new Queue<string>();
 
         }
-
+        /// <summary>
+        /// Tries login user into database
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public bool LoginUser(string email, string password)
         {
             _actualTradingPair = (from x in _forexTradingContext.TraidingPairs select x).FirstOrDefault();
@@ -58,7 +69,14 @@ namespace ForexTradingWcfServiceLibrary
             else
                 return false;
         }
-
+        /// <summary>
+        /// Tries register into database
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="surename"></param>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public bool RegisterUser(string name, string surename, string email, string password)
         {
             var pass = BCrypt.Net.BCrypt.HashPassword(password);
@@ -68,7 +86,12 @@ namespace ForexTradingWcfServiceLibrary
             _forexTradingContext.SaveChanges();
             return true;
         }
-
+        /// <summary>
+        /// Returns most recent forext data according to servertime
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="tradingPair"></param>
+        /// <returns></returns>
         public ForexData GetData(int count, string tradingPair)
         {
             ForexTradingContext _forexTradingContext = new ForexTradingContext();
@@ -87,13 +110,21 @@ namespace ForexTradingWcfServiceLibrary
             return convertedData;
 
         }
-
+        /// <summary>
+        /// Returns all avaible trading pairs
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetAllTradingPairs()
         {
             return (from x in _forexTradingContext.TraidingPairs select x.FullName)
                 .ToList();
         }
-
+        /// <summary>
+        /// Add new asset to users portfolio
+        /// </summary>
+        /// <param name="tradingPair"></param>
+        /// <param name="dateOfBuy"></param>
+        /// <param name="investment"></param>
         public void AddAsset(string tradingPair, long dateOfBuy, double investment)
         {
             DateTime timeOfBuy = new DateTime(dateOfBuy, DateTimeKind.Utc);
@@ -120,6 +151,10 @@ namespace ForexTradingWcfServiceLibrary
 
         }
 
+        /// <summary>
+        /// Set users asset as sold
+        /// </summary>
+        /// <param name="id"></param>
         public void SellAsset(int id)
         {
             ForexTradingContext forexTradingContext = new ForexTradingContext();
@@ -132,12 +167,18 @@ namespace ForexTradingWcfServiceLibrary
             forexTradingContext.SaveChanges();
 
         }
-
+        /// <summary>
+        /// Returns actual server time
+        /// </summary>
+        /// <returns></returns>
         public long GetServerTime()
         {
             return _serverTime.Ticks;
         }
 
+        /// <summary>
+        /// Helper class for query from database
+        /// </summary>
         private class TradingDataFoo
         {
             public int Id { get; set; }
@@ -148,7 +189,10 @@ namespace ForexTradingWcfServiceLibrary
 
             public double Investment { get; set; }
         }
-
+        /// <summary>
+        /// Returns actual porfolio of user 
+        /// </summary>
+        /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
             try
@@ -238,7 +282,10 @@ namespace ForexTradingWcfServiceLibrary
                 return new KeyValuePair<string[], List<string[]>>();
             }
         }
-
+        /// <summary>
+        /// Returns portfolio history of user
+        /// </summary>
+        /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolioHistory()
         {
             try
@@ -332,7 +379,11 @@ namespace ForexTradingWcfServiceLibrary
             }
         }
 
-
+        /// <summary>
+        /// Returns actual value of trading pair
+        /// </summary>
+        /// <param name="tradingPair"></param>
+        /// <returns></returns>
         public double GetActualValue(string tradingPair)
         {
             var tradingPairF = (from x in _forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
@@ -343,8 +394,13 @@ namespace ForexTradingWcfServiceLibrary
                     orderby x.Date descending
                     select x.Value).First();
         }
-
-        private ForexData ConvertData(List<ForexTradingDatabase.TraidingPairData> data, int count)
+        /// <summary>
+        /// Convert database Forexdata to service ForexData
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private ForexData ConvertData(List<ForexTradingDatabase.TradingPairData> data, int count)
         {
             if (data.Count != 0)
             {
@@ -359,7 +415,9 @@ namespace ForexTradingWcfServiceLibrary
 
             return null;
         }
-
+        /// <summary>
+        /// Writes logs to server
+        /// </summary>
         private void WriteLogs()
         {
             Console.Clear();
@@ -371,6 +429,11 @@ namespace ForexTradingWcfServiceLibrary
                 Console.WriteLine(log);
             }
         }
+        /// <summary>
+        /// Handling event when server sends trading pair data to user
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             try
@@ -394,13 +457,17 @@ namespace ForexTradingWcfServiceLibrary
                 _serverTime = _serverTime.AddMinutes(1);
                 WriteLogs();
             }
-            catch (Exception ex)
+            catch(ObjectDisposedException ex)
             {
                 string message = $"{_serverTime} {_actualUser.Email} was disconeted";
                 Console.WriteLine(message);
                 logs.Enqueue(message);
                 _user = null;
                 _actualUser = null;
+            }
+            catch (Exception ex)
+            {
+                logs.Enqueue(ex.Message);
             }
         }
     }

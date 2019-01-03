@@ -5,7 +5,7 @@
                     >
 
     <SolidColorBrush x:Key="GrayBlack" Color="#FF191919"/>
-   
+
     <SolidColorBrush x:Key="GrayBlackDarker" Color="#FF151515"/>
     <SolidColorBrush x:Key="GrayBlackLighterWithOpacity" Color="#3F252525"/>
     <SolidColorBrush x:Key="GrayBlackLighterWithHigherOpacity" Color="#AF252525"/>

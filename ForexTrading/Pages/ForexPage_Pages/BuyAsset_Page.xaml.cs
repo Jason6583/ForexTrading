@@ -17,23 +17,35 @@ using ForexTrading.Windows;
 namespace ForexTrading.Pages.ForexPage_Pages
 {
     /// <summary>
-    /// Interaction logic for BuyTradingPair.xaml
+    /// Page for buying assets
     /// </summary>
     public partial class BuyAsset_Page : Page
     {
         private Core.Core _core;
+        /// <summary>
+        /// Constructor for buying page
+        /// </summary>
+        /// <param name="core"></param>
         public BuyAsset_Page(Core.Core core)
         {
             InitializeComponent();
             _core = core;
         }
-
+        /// <summary>
+        /// Action when page is loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             ComboBox_TradingPair.ItemsSource = _core.GetAllTradingPairs();
             ComboBox_TradingPair.SelectedValue = ComboBox_TradingPair.Items[0];
         }
-
+        /// <summary>
+        /// Action when assest is bought
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BUY_CLICK(object sender, MouseButtonEventArgs e)
         {
             try

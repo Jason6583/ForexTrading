@@ -26,10 +26,13 @@ using ForexTrading.Pages.ForexPage_Pages;
 namespace ForexTrading.Pages
 {
     /// <summary>
-    /// Interaction logic for ForexPage.xaml
+    /// Main page for forex trading
     /// </summary>
     public partial class ForexPage : Page, INotifyPropertyChanged
     {
+        /// <summary>
+        /// Enum for side menu items
+        /// </summary>
         private enum SideMenuItem
         {
             BuyAsset,
@@ -52,7 +55,7 @@ namespace ForexTrading.Pages
         private List<ContentPresenter> _sideMenuItems;
 
         private BuyAsset_Page _buyAsset_Page;
-        private TotalPortfolio_Page _totalPortfolio_Page;
+        private ActivePortfolio_Page _activePortfolio_Page;
         private History_Page _history_Page;
 
         bool _isSideMenuUp;
@@ -61,12 +64,12 @@ namespace ForexTrading.Pages
         Thickness _marginOfTradingPair;
         string _userEmail;
         #region Properties
-        public ObservableCollection<KeyValuePair<DateTime, double>> EurUsD
+        public ObservableCollection<KeyValuePair<DateTime, double>> ForexData
         {
             get => _eurUsd;
             set
             {
-                OnPropertyChanged(nameof(EurUsD));
+                OnPropertyChanged(nameof(ForexData));
                 _eurUsd = value;
             }
         }
@@ -77,7 +80,7 @@ namespace ForexTrading.Pages
             set
             {
                 _dataCount = value;
-                EurUsdChart.DataCount = _dataCount;
+                ForexChart.DataCount = _dataCount;
             }
         }
 
@@ -143,7 +146,10 @@ namespace ForexTrading.Pages
 
         #endregion
         string _actualTradingPair;
-
+        /// <summary>
+        /// Constructor for forex page
+        /// </summary>
+        /// <param name="core"></param>
         public ForexPage(Core.Core core)
         {
             InitializeComponent();
@@ -175,55 +181,67 @@ namespace ForexTrading.Pages
             _history_Page = new History_Page();
             //Intializing datasources for chart
 
-            EurUsD = new ObservableCollection<KeyValuePair<DateTime, double>>();
+            ForexData = new ObservableCollection<KeyValuePair<DateTime, double>>();
             ActualTradingPair = "EUR/USD";
             LoadTradingPairs();
 
             _core.Client.ReceiveDataEvent += Client_ReceiveDataEvent;
             _core.SoldAssetEvent += _core_SoldAssetEvent;
 
-            _totalPortfolio_Page = new TotalPortfolio_Page();
+            _activePortfolio_Page = new ActivePortfolio_Page();
         }
-
+        /// <summary>
+        /// Event when asset was sold
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void _core_SoldAssetEvent(object source, EventArgs args)
         {
             _history_Page.LoadHistory(_core.GetPortFolioHistory());
         }
-
+        /// <summary>
+        /// Event when asset data was received from service
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void Client_ReceiveDataEvent(object source, Core.Client.ReceiveDataArgs args)
         {
             if (args.Name == ActualTradingPair)
             {
                 foreach (var data in args.Data)
                 {
-                    EurUsD.Add(data);
+                    ForexData.Add(data);
                 }
             }
 
             if (_isSideMenuUp)
                 Task.Run(() =>
                 {
-                    _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
+                    _activePortfolio_Page.LoadPortfolio(_core.GetPortFolio());
                 });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Event for property changed
+        /// </summary>
+        /// <param name="propertyName"></param>
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void Da_Completed(object sender, EventArgs e)
-        {
-            EurUsdChart.ForceResize();
-        }
-
-        private void EurUsdChart_Loaded(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Event when 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ForexChart_Loaded(object sender, RoutedEventArgs e)
         {
             var data = _core.GetData(DataCount, "EUR/USD");
-            EurUsdChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(data));
+            ForexChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(data));
 
         }
 
@@ -232,6 +250,11 @@ namespace ForexTrading.Pages
         /// </summary>
         #region Top menu region
         double _menuHeight = 100;
+        /// <summary>
+        /// Shows top menu when mouse enters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
         {
 
@@ -243,7 +266,11 @@ namespace ForexTrading.Pages
 
 
         }
-
+        /// <summary>
+        /// Hides top menu when mouse leaves
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBlock_MouseLeave(object sender, MouseEventArgs e)
         {
             if (_isTraidingPairsMenuUp)
@@ -255,7 +282,11 @@ namespace ForexTrading.Pages
                 Border_TradingPairs.BorderThickness = new Thickness(0);
             }
         }
-
+        /// <summary>
+        /// Keeping top menu visibile when enter menu grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Grid_TraidingPairs_MouseEnter(object sender, MouseEventArgs e)
         {
             DoubleAnimation da = new DoubleAnimation(0, _menuHeight, TimeSpan.FromMilliseconds(0));
@@ -264,7 +295,11 @@ namespace ForexTrading.Pages
 
             Border_TradingPairs.BorderThickness = new Thickness(2);
         }
-
+        /// <summary>
+        /// Hides menu when mouse leave from menu grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Grid_TraidingPairs_MouseLeave(object sender, MouseEventArgs e)
         {
             if (_isTraidingPairsMenuUp)
@@ -294,7 +329,7 @@ namespace ForexTrading.Pages
         }
 
         /// <summary>
-        /// Create row and column definitions for traidingPair menu
+        /// Creates row and column definitions for traidingPair menu
         /// </summary>
         private void CreateMenuTP(int rows)
         {
@@ -310,7 +345,7 @@ namespace ForexTrading.Pages
         }
 
         /// <summary>
-        /// Create menu item for trading pair menu
+        /// Creates menu item for trading pair menu
         /// </summary>
         private void CreateMenuItemTP(string text, int index)
         {
@@ -341,10 +376,10 @@ namespace ForexTrading.Pages
             if (ActualTradingPair != ((TextBlock)sender).Text)
             {
                 ActualTradingPair = ((TextBlock)sender).Text;
-                EurUsdChart.Clear();
+                ForexChart.Clear();
 
                 var forexData = _core.GetData(DataCount, ActualTradingPair);
-                EurUsdChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(forexData));
+                ForexChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(forexData));
             }
         }
 
@@ -370,7 +405,7 @@ namespace ForexTrading.Pages
                     ChangeSizeOfSideMenu(SideMenuItem.ActivePortfolio);
 
                     _acutalSideMenuItem = SideMenu_ActivePortfolio;
-                    Frame_Menu.Content = _totalPortfolio_Page;
+                    Frame_Menu.Content = _activePortfolio_Page;
 
                     break;
                 case SideMenuItem.History:
@@ -402,8 +437,13 @@ namespace ForexTrading.Pages
             }
         }
 
-        KeyValuePair<string[], List<string[]>> totalPortfolio;
-        private void SideMenu_TotalPortfolio_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+
+        /// <summary>
+        /// Switches side menu item to active portfolio page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SideMenu_ActivePortfolio_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!_isSideMenuUp)
             {
@@ -415,11 +455,15 @@ namespace ForexTrading.Pages
                 SwitchMenu(SideMenuItem.ActivePortfolio);
             }
 
-            _totalPortfolio_Page.LoadPortfolio(_core.GetPortFolio());
+            _activePortfolio_Page.LoadPortfolio(_core.GetPortFolio());
 
 
         }
-
+        /// <summary>
+        /// Switches side menu item to history page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SideMenu_History_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!_isSideMenuUp)
@@ -435,6 +479,11 @@ namespace ForexTrading.Pages
             Task.Run(() => { _history_Page.LoadHistory(_core.GetPortFolioHistory()); });
 
         }
+        /// <summary>
+        /// Switches side menu item to buying page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SideMenu_BuyAsset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!_isSideMenuUp)
@@ -451,52 +500,73 @@ namespace ForexTrading.Pages
 
         private double _widhtOfSideMenu = 150;
         private double _widhtOfActivePortfolio = 350;
-
+        /// <summary>
+        /// Creates animation for side menu 
+        /// </summary>
+        /// <param name="sideMenuItem"></param>
         private void ChangeSizeOfSideMenu(SideMenuItem sideMenuItem)
         {
             if (sideMenuItem == SideMenuItem.ActivePortfolio || sideMenuItem == SideMenuItem.History)
             {
                 if (_acutalSideMenuItem != SideMenu_ActivePortfolio && _acutalSideMenuItem != SideMenu_History)
                 {
-                    DoubleAnimation da = new DoubleAnimation(_widhtOfSideMenu, _widhtOfActivePortfolio,
+                    DoubleAnimation doubleAnimationWidth = new DoubleAnimation(_widhtOfSideMenu, _widhtOfActivePortfolio,
                         TimeSpan.FromMilliseconds(500));
-                    da.Completed += Da_Completed;
+                    doubleAnimationWidth.Completed += DoubleAnimationWidth_Completed;
 
-                    Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
+                    Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, doubleAnimationWidth);
                     _isSideMenuUp = true;
                 }
             }
             else
             {
-                DoubleAnimation da = new DoubleAnimation(_widhtOfActivePortfolio, _widhtOfSideMenu, TimeSpan.FromMilliseconds(500));
-                da.Completed += Da_Completed;
+                DoubleAnimation doubleAnimationWidth = new DoubleAnimation(_widhtOfActivePortfolio, _widhtOfSideMenu, TimeSpan.FromMilliseconds(500));
+                doubleAnimationWidth.Completed += DoubleAnimationWidth_Completed;
 
-                Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
+                Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, doubleAnimationWidth);
                 _isSideMenuUp = true;
             }
         }
+        /// <summary>
+        /// Event when animation for side menu is completed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DoubleAnimationWidth_Completed(object sender, EventArgs e)
+        {
+            ForexChart.ForceResize();
+        }
+        /// <summary>
+        /// Creates animation for side menu and showing it
+        /// </summary>
+        /// <param name="width"></param>
         private void ShowSideMenu(double width)
         {
-            DoubleAnimation da = new DoubleAnimation(0, width, TimeSpan.FromMilliseconds(500));
-            da.Completed += Da_Completed;
+            DoubleAnimation doubleAnimationWidth = new DoubleAnimation(0, width, TimeSpan.FromMilliseconds(500));
+            doubleAnimationWidth.Completed += DoubleAnimationWidth_Completed;
 
-            Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
+            Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, doubleAnimationWidth);
             _isSideMenuUp = true;
         }
-
+        /// <summary>
+        /// Hiding side menu
+        /// </summary>
+        /// <param name="width"></param>
         private void HideMenu(double width)
         {
-            DoubleAnimation da = new DoubleAnimation(width, 0.0, TimeSpan.FromMilliseconds(500));
+            DoubleAnimation doubleAnimationWidth = new DoubleAnimation(width, 0.0, TimeSpan.FromMilliseconds(500));
 
-            da.Completed += Da_Completed;
-            Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, da);
+            doubleAnimationWidth.Completed += DoubleAnimationWidth_Completed;
+            Frame_Menu.BeginAnimation(FrameworkElement.WidthProperty, doubleAnimationWidth);
             _isSideMenuUp = false;
         }
 
-
-
         #endregion
-
+        /// <summary>
+        /// Event when forex page is loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MarginOfTradingPair = new Thickness(TextBlock_UserEmail.ActualWidth, 0, 0, 0);

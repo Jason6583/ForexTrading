@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ForexTradingDatabase
 {
+    /// <summary>
+    /// Class for trading pair in database
+    /// </summary>
     [Serializable]
     public class TradingPair
     {

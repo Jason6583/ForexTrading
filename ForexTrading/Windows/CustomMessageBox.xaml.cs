@@ -39,7 +39,9 @@ namespace ForexTrading.Windows
     }
     public partial class CustomMessageBox : Window, INotifyPropertyChanged
     {
-
+        /// <summary>
+        /// Constructor for custom messagebox
+        /// </summary>
         public CustomMessageBox()
         {
             InitializeComponent();
@@ -64,7 +66,13 @@ namespace ForexTrading.Windows
         static MessageBoxResult _result = MessageBoxResult.No;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
+        /// <summary>
+        /// Shows custom box 
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="msg"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show
         (string caption, string msg, MessageBoxType type)
         {
@@ -89,27 +97,59 @@ namespace ForexTrading.Windows
                     return MessageBoxResult.No;
             }
         }
+        /// <summary>
+        /// Oveloading method for showing custom box
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show(string msg, MessageBoxType type)
         {
             return Show(string.Empty, msg, type);
         }
+        /// <summary>
+        /// Oveloading method for showing custom box
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show(string msg)
         {
             return Show(string.Empty, msg,
             MessageBoxButton.OK, MessageBoxImage.None);
         }
+        /// <summary>
+        /// Oveloading method for showing custom box
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show
         (string caption, string text)
         {
             return Show(caption, text,
             MessageBoxButton.OK, MessageBoxImage.None);
         }
+        /// <summary>
+        /// Oveloading method for showing custom box
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="text"></param>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show
         (string caption, string text, MessageBoxButton button)
         {
             return Show(caption, text, button,
             MessageBoxImage.None);
         }
+        /// <summary>
+        /// Oveloading method for showing custom box
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="text"></param>
+        /// <param name="button"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public static MessageBoxResult Show
         (string caption, string text,
         MessageBoxButton button, MessageBoxImage image)
@@ -121,6 +161,10 @@ namespace ForexTrading.Windows
             _messageBox.ShowDialog();
             return _result;
         }
+        /// <summary>
+        /// Shows options for messagebox
+        /// </summary>
+        /// <param name="button"></param>
         private static void SetVisibilityOfButtons(MessageBoxButton button)
         {
             switch (button)
@@ -149,6 +193,10 @@ namespace ForexTrading.Windows
                     break;
             }
         }
+        /// <summary>
+        /// Creates image for custom box
+        /// </summary>
+        /// <param name="image"></param>
         private static void SetImageOfMessageBox(MessageBoxImage image)
         {
             switch (image)
@@ -169,6 +217,11 @@ namespace ForexTrading.Windows
                     break;
             }
         }
+        /// <summary>
+        /// Handle event for click on button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (sender == btnOk)
@@ -184,22 +237,37 @@ namespace ForexTrading.Windows
             _messageBox.Close();
             _messageBox = null;
         }
+        /// <summary>
+        /// Setting image for custom messagebox
+        /// </summary>
+        /// <param name="imageName"></param>
         private void SetImage(string imageName)
         {
             string uri = string.Format("/Resources/images/{0}", imageName);
             var uriSource = new Uri(uri, UriKind.RelativeOrAbsolute);
         }
-
+        /// <summary>
+        /// Handling close button event click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
-
+        /// <summary>
+        /// Handling minimize for message box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             this.WindowState = System.Windows.WindowState.Minimized;
         }
-
+        /// <summary>
+        /// Handling event for property changed
+        /// </summary>
+        /// <param name="propertyName"></param>
         protected void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -207,7 +275,11 @@ namespace ForexTrading.Windows
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
+        /// <summary>
+        /// Handling event when windows states changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState != System.Windows.WindowState.Maximized)

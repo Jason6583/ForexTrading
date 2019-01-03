@@ -16,6 +16,9 @@ using ForexTrading.Windows;
 
 namespace ForexTrading
 {
+    /// <summary>
+    /// Class for StylesLibrary 
+    /// </summary>
     public partial class StylesDictionary
     {
         public static MainWindow _mainWindow;
@@ -24,13 +27,21 @@ namespace ForexTrading
             Window window = (sender as Button).Tag as Window;
             window.Close();
         }
-
+        /// <summary>
+        /// Handling event for windows button , minimize
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MinimizeButt_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Window window = (sender as Button).Tag as Window;
             window.WindowState = System.Windows.WindowState.Minimized;
         }
-
+        /// <summary>
+        /// Handling event for windows button, maximize
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MaximizeButt_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Window window = (sender as Button).Tag as Window;
@@ -44,10 +55,15 @@ namespace ForexTrading
                 window.WindowState = System.Windows.WindowState.Normal;
             }
         }
-
+        /// <summary>
+        /// Region for menu template
+        /// </summary>
         #region Menu
         TextBlock _acutalMenuItem;
         private HashSet<TextBlock> _menuItems = new HashSet<TextBlock>();
+        /// <summary>
+        /// Unselect all items in menu
+        /// </summary>
         private void UnSellectAll()
         {
             foreach (var item in _menuItems)
@@ -55,6 +71,11 @@ namespace ForexTrading
                 item.Style = _mainWindow.FindResource("MenuTextBlockStyle") as Style;
             }
         }
+        /// <summary>
+        /// Handling click event for menu item 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LeftMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             UnSellectAll();
@@ -73,7 +94,11 @@ namespace ForexTrading
                 _acutalMenuItem = null;
             }
         }
-
+        /// <summary>
+        /// Handling click event for textbox(button) in ActiveAssetsTemplate
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var id = ((TextBlock)sender).Tag;
@@ -81,13 +106,28 @@ namespace ForexTrading
         }
     }
     #endregion
+    /// <summary>
+    /// Converter for active assets
+    /// </summary>
     public sealed class IsLessThanConverter : MarkupExtension, IMultiValueConverter
     {
+        /// <summary>
+        /// Implements method for MarkupExtension
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             return this;
         }
-
+        /// <summary>
+        /// Converts color for active asset
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (System.Convert.ToDouble(((string)values[1]).Replace('.', ',')) > StylesDictionary._mainWindow.Core.GetActualValue((string)values[0]))
@@ -95,15 +135,32 @@ namespace ForexTrading
             else
                 return StylesDictionary._mainWindow.FindResource("Green") as SolidColorBrush;
         }
-
+        /// <summary>
+        /// Implements method for IMultiValueConverter
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetTypes"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
     }
-
+    /// <summary>
+    /// Convert for total portfolio 
+    /// </summary>
     public sealed class TotalSumConverter : MarkupExtension, IValueConverter
     {
+        /// <summary>
+        /// Converter for total portfolio sum, changes color of sum 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
@@ -117,13 +174,24 @@ namespace ForexTrading
 
             return Brushes.Transparent;
         }
-
+        /// <summary>
+        /// Implements method for IValueConverter
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object ConvertBack(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
-
+        /// <summary>
+        /// Implements method for MarkupExtension
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             return this;
@@ -143,7 +211,11 @@ namespace ForexTrading
                 typeof(bool),
                 typeof(PasswordBoxProperties), 
                 new PropertyMetadata(false, OnMonitorPasswordChanged));
-
+        /// <summary>
+        /// Event for password changes in passwordbox
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
         private static void OnMonitorPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var passwordBox = (PasswordBox) d;
@@ -158,7 +230,7 @@ namespace ForexTrading
             }
         }
         /// <summary>
-        /// Event why is typed in passwordbox
+        /// Event when is typed into passwordbox
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -166,12 +238,20 @@ namespace ForexTrading
         {
             SetHasText((PasswordBox)sender, false);
         }
-
+        /// <summary>
+        /// Sets attached property to passwordbox
+        /// </summary>
+        /// <param name="passwordBox"></param>
+        /// <param name="value"></param>
         public static void SetMonitorPassword(PasswordBox passwordBox, bool value)
         {
             passwordBox.SetValue(MonitorPasswordProperty, true);
         }
-
+        /// <summary>
+        /// Getter for monitorpassword
+        /// </summary>
+        /// <param name="passwordBox"></param>
+        /// <returns></returns>
         public static bool GetMonitorPassword(PasswordBox passwordBox)
         {
             return (bool)passwordBox.GetValue(MonitorPasswordProperty);
@@ -182,12 +262,20 @@ namespace ForexTrading
                 typeof(bool), 
                 typeof(PasswordBoxProperties), 
                 new PropertyMetadata(false));
-
+        /// <summary>
+        /// Setter for HasText
+        /// </summary>
+        /// <param name="passwordBox"></param>
+        /// <param name="value"></param>
         public static void SetHasText(PasswordBox passwordBox, bool value)
         {
             passwordBox.SetValue(HasTextProperty, passwordBox.Password.Length > 0);
         }
-
+        /// <summary>
+        /// Getter for HasText
+        /// </summary>
+        /// <param name="passwordBox"></param>
+        /// <returns></returns>
         public static bool GetHasText(PasswordBox passwordBox)
         {
             return (bool)passwordBox.GetValue(HasTextProperty);

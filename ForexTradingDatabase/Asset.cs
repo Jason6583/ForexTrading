@@ -6,7 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ForexTradingDatabase
-{
+{  
+    /// <summary>
+    /// Asset class in database
+    /// </summary>
     [Serializable]
     public class Asset
     {

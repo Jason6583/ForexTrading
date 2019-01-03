@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace ForexTradingDatabase
 {
+
+    /// <summary>
+    /// Class for portfolio data in database
+    /// </summary>
     [Serializable]
    public class PortFolioData
     {

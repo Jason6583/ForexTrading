@@ -9,6 +9,9 @@ using System.Data.Entity;
 
 namespace Generator
 {
+    /// <summary>
+    /// Generator for filling forex data into database
+    /// </summary>
     class Program
     {
         static private ForexTradingContext forexTradingContex;
@@ -20,7 +23,11 @@ namespace Generator
 
 
         }
-
+        /// <summary>
+        /// Adds new asset to dabase
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Asset AddAsset(string name)
         {
             Asset asset = new Asset() { Name = name };
@@ -30,6 +37,11 @@ namespace Generator
             return asset;
         }
 
+        /// <summary>
+        /// Adds new trading pair to dabase
+        /// </summary>
+        /// <param name="idFIrst"></param>
+        /// <param name="idSecond"></param>
         public static void AddTradingPair(string idFIrst, string idSecond)
         {
             forexTradingContex.TraidingPairs.Add(new TradingPair()
@@ -40,6 +52,12 @@ namespace Generator
             forexTradingContex.SaveChanges();
         }
 
+        /// <summary>
+        /// Adds trading pair data to dabase
+        /// </summary>
+        /// <param name="nameOfFIle"></param>
+        /// <param name="idFirst"></param>
+        /// <param name="idSecond"></param>
         public static void AddData(string nameOfFIle, string idFirst, string idSecond)
         {
 
@@ -69,7 +87,7 @@ namespace Generator
                 date = date.AddMinutes(time.Minute);
 
 
-                TraidingPairData traidingPairData = new TraidingPairData()
+                TradingPairData traidingPairData = new TradingPairData()
                 {
                     Date = date,
                     TradingPairId = tradingPair.Id,

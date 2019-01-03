@@ -9,8 +9,14 @@ using ForexTradingDatabase.Migrations;
 
 namespace ForexTradingDatabase
 {
+    /// <summary>
+    /// Database context for forex trading
+    /// </summary>
     public class ForexTradingContext : DbContext
     {
+        /// <summary>
+        /// Context constructor
+        /// </summary>
         public ForexTradingContext() : base()
         {
             //For other user they want to try this application with filled database
@@ -30,6 +36,11 @@ namespace ForexTradingDatabase
 
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
         }
+        /// <summary>
+        /// Fiding actual solution directory
+        /// </summary>
+        /// <param name="currentPath"></param>
+        /// <returns></returns>
         public static DirectoryInfo TryGetSolutionDirectoryInfo(string currentPath = null)
         {
             var directory = new DirectoryInfo(
@@ -40,7 +51,10 @@ namespace ForexTradingDatabase
             }
             return directory;
         }
-
+        /// <summary>
+        /// Overloading constructor for context, if connection string is in App.config
+        /// </summary>
+        /// <param name="nameOrConnectionString"></param>
         public ForexTradingContext(string nameOrConnectionString) : base(nameOrConnectionString)
         {
 
@@ -49,7 +63,7 @@ namespace ForexTradingDatabase
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<TradingPair> TraidingPairs { get; set; }
-        public virtual DbSet<TraidingPairData> TraidingPairDatas { get; set; }
+        public virtual DbSet<TradingPairData> TraidingPairDatas { get; set; }
         public virtual DbSet<PortFolioData> PortFolioDatas { get; set; }
     }
 }

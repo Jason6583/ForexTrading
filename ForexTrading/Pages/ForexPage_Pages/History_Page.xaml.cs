@@ -19,7 +19,7 @@ using ForexTrading.Annotations;
 namespace ForexTrading.Pages.ForexPage_Pages
 {
     /// <summary>
-    /// Interaction logic for History_Page.xaml
+    /// Page for showing trading history
     /// </summary>
     public partial class History_Page : Page, INotifyPropertyChanged
     {
@@ -34,12 +34,18 @@ namespace ForexTrading.Pages.ForexPage_Pages
                 OnPropertyChanged("SummaryStats");
             }
         }
+        /// <summary>
+        /// Constructor for history page
+        /// </summary>
         public History_Page()
         {
             InitializeComponent();
             DataContext = this;
         }
-
+        /// <summary>
+        /// Action when history page is loaded
+        /// </summary>
+        /// <param name="portofolioData"></param>
         public void LoadHistory(KeyValuePair<string[], List<string[]>> portofolioData)
         {
             Dispatcher.Invoke(() =>

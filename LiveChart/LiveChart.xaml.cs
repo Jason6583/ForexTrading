@@ -29,6 +29,9 @@ using UserControl = System.Windows.Controls.UserControl;
 
 namespace LiveChart
 {
+    /// <summary>
+    /// Class for handling range for input
+    /// </summary>
     public static class InputExtensions
     {
         public static int LimitToRange(
@@ -40,6 +43,9 @@ namespace LiveChart
         }
     }
 
+    /// <summary>
+    /// Enum for handling XAxis time unit
+    /// </summary>
     public enum XAxisValue
     {
         Second,
@@ -195,7 +201,9 @@ namespace LiveChart
         }
 
         #endregion
-
+        /// <summary>
+        /// Constructor for LiveChartControl
+        /// </summary>
         public LiveChartControl()
         {
             InitializeComponent();
@@ -221,7 +229,9 @@ namespace LiveChart
 
             CanvasMain.Children.Add(_mainLine);
         }
-
+        /// <summary>
+        /// Clears whole chart and set it as new
+        /// </summary>
         public void Clear()
         {
             //Dequeue thread and may happend changed collection
@@ -259,7 +269,10 @@ namespace LiveChart
 
             Init();
         }
-
+        /// <summary>
+        /// Method for loading data into chart without animation
+        /// </summary>
+        /// <param name="collection"></param>
         public void Load(ObservableCollection<KeyValuePair<DateTime, double>> collection)
         {
             foreach (KeyValuePair<DateTime, double> item in collection)
@@ -271,7 +284,11 @@ namespace LiveChart
         private Queue<Thread> threads = new Queue<Thread>();
         private volatile Semaphore semaphore = new Semaphore(1, 1000);
         private DateTime lastValue = new DateTime();
-
+        /// <summary>
+        /// Handling event when new data is added to chart
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (lastValue != ((KeyValuePair<DateTime, double>)e.NewItems[0]).Key)
@@ -293,7 +310,10 @@ namespace LiveChart
             }
             lastValue = ((KeyValuePair<DateTime, double>)e.NewItems[0]).Key;
         }
-
+        /// <summary>
+        /// Creates animation for line
+        /// </summary>
+        /// <param name="newPoint"></param>
         private void CreateAddAnimationForLine(Point newPoint)
         {
             var x = newPoint.X;
@@ -306,14 +326,21 @@ namespace LiveChart
             PointAnimation addLineAnimation1 = new PointAnimation(new Point(x, _bottomOfChart), _durationOfAnimations);
             _pathFigureOfMainLine.Segments[_indexOfLastFigure + 1].BeginAnimation(LineSegment.PointProperty, addLineAnimation1);
         }
-
+        /// <summary>
+        /// Handling event when AddLineAnimation is done
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddLineAnimation_Completed(object sender, EventArgs e)
         {
             semaphore.Release();
             if (threads.Count > 0)
                 threads.Dequeue();
         }
-
+        /// <summary>
+        /// Creates animation for Dot and Text
+        /// </summary>
+        /// <param name="value"></param>
         private void CreateAnimationForShiftDotAndText(double value)
         {
             TranslateTransform trans = new TranslateTransform();
@@ -333,7 +360,10 @@ namespace LiveChart
 
 
         }
-
+        /// <summary>
+        /// Creates animation for shifting Dot and Text
+        /// </summary>
+        /// <param name="value"></param>
         private void ShiftDotAndTextWithoutAnimation(double value)
         {
             TranslateTransform trans = new TranslateTransform();
@@ -358,6 +388,10 @@ namespace LiveChart
 
         //List of new pointsY when Y shifts
         private List<Point> pointsY;
+        /// <summary>
+        /// Creats animation for shifting all lines according to Y axis
+        /// </summary>
+        /// <param name="value"></param>
         private void ShiftYVisibleField(double value)
         {
             pointsY = new List<Point>();
@@ -376,7 +410,10 @@ namespace LiveChart
                 lineSegment.BeginAnimation(LineSegment.PointProperty, shiftYAnimation);
             }
         }
-
+        /// <summary>
+        /// Shifting all lines according to Y axis without animation
+        /// </summary>
+        /// <param name="value"></param>
         private void ShiftYVisibleFieldWithoutAnimation(double value)
         {
 
@@ -386,7 +423,11 @@ namespace LiveChart
                 lineSegment.Point = new Point(lineSegment.Point.X, lineSegment.Point.Y + value);
             }
         }
-
+        /// <summary>
+        /// Handling event when ShiftYAnimation is done
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShiftYAnimation_Completed(object sender, EventArgs e)
         {
             for (int i = 0; i < pointsY.Count; i++)
@@ -412,6 +453,12 @@ namespace LiveChart
         int i;
         double _actualShift;
         bool edge;
+        /// <summary>
+        /// Returns value how much is need to shift when new value is added to chart
+        /// calculate how much is need to shift from time 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private double GetValueOfShift(KeyValuePair<DateTime, double> data)
         {
             TimeSpan timeDifference = data.Key - _lastData.Key;
@@ -433,6 +480,9 @@ namespace LiveChart
 
             return -1;
         }
+        /// <summary>
+        /// Sets last time according to X axis unit
+        /// </summary>
         private void SetLastTime()
         {
             switch (XAxisUnit)
@@ -457,6 +507,9 @@ namespace LiveChart
                     break;
             }
         }
+        /// <summary>
+        /// Sets first time according to X axis unit
+        /// </summary>
         private void SetFirstTime()
         {
             switch (XAxisUnit)
@@ -481,6 +534,10 @@ namespace LiveChart
                     break;
             }
         }
+        /// <summary>
+        /// Adds value to chart, calls all animations
+        /// </summary>
+        /// <param name="data"></param>
         public void AddValue(KeyValuePair<DateTime, double> data)
         {
             //Resize();
@@ -598,7 +655,10 @@ namespace LiveChart
             _lastData = data;
 
         }
-
+        /// <summary>
+        /// Adds value to chart without animation
+        /// </summary>
+        /// <param name="data"></param>
         public void AddValueWithoutAnimation(KeyValuePair<DateTime, double> data)
         {
             //Resize();
@@ -713,6 +773,10 @@ namespace LiveChart
         }
 
         private List<Point> pointsX;
+        /// <summary>
+        /// Creates animation for shifing all line according to X axis
+        /// </summary>
+        /// <param name="value"></param>
         private void ShiftXVisibleField(double value)
         {
             pointsX = new List<Point>();
@@ -735,6 +799,11 @@ namespace LiveChart
             _mainLine.RenderTransform = shiftRenderTransform;
 
         }
+        /// <summary>
+        /// Handling event when ShiftXAnimation is done
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShiftXAnimation_Completed(object sender, EventArgs e)
         {
             //Delete segments out of visible field
@@ -746,7 +815,9 @@ namespace LiveChart
                 _indexOfLastFigure--;
             }
         }
-
+        /// <summary>
+        /// Class with background grid
+        /// </summary>
         private class GridBackground
         {
             public List<Line> linesHorizontal;
@@ -762,7 +833,9 @@ namespace LiveChart
                 labelsVertical = new List<Label>();
             }
         }
-
+        /// <summary>
+        /// Sets background grid to propert values
+        /// </summary>
         private void SetGridBackground()
         {
             for (int i = 0; i < _gridBackground.labelsHorizontal.Count; i++)
@@ -822,7 +895,9 @@ namespace LiveChart
         }
 
         private Window mainWindow;
-
+        /// <summary>
+        /// Method for initializing all properties and fields 
+        /// </summary>
         private void Init()
         {
             mainWindow = Window.GetWindow(this);
@@ -863,9 +938,6 @@ namespace LiveChart
             HwndSource hwndSource = PresentationSource.FromVisual(this) as HwndSource;
             HwndTarget hwndTarget = hwndSource.CompositionTarget;
             hwndTarget.RenderMode = RenderMode.SoftwareOnly;
-
-
-
          
             Dot.Effect = new DropShadowEffect
             {
@@ -932,6 +1004,11 @@ namespace LiveChart
 
             DataSource.CollectionChanged += DataSource_CollectionChanged;
         }
+        /// <summary>
+        /// Handling event when chart is loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LinearChartControl_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -941,6 +1018,11 @@ namespace LiveChart
         //Size remain same after state update
         double widthBeforeStateChanged;
         double heightBeforeStateChanged;
+        /// <summary>
+        /// Handling event when mainwindows changed state
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
             if (mainWindow.WindowState == WindowState.Maximized)
@@ -958,6 +1040,10 @@ namespace LiveChart
 
         private double _lineCountHorizontal = 6;
         private double _lineCountVertical = 10;
+        /// <summary>
+        /// Creates background grid
+        /// </summary>
+        /// <param name="xAxisValue"></param>
         private void MakeGridBackgroud(XAxisValue xAxisValue)
         {
             //Vertical lines
@@ -1023,7 +1109,9 @@ namespace LiveChart
                 _gridBackground.linesVertical.Add(line);
             }
         }
-
+        /// <summary>
+        /// Creates background grid
+        /// </summary>
         private void MakeGridBackground()
         {
 
@@ -1064,7 +1152,9 @@ namespace LiveChart
 
         DateTime _firstTime;
         DateTime _lastTime;
-
+        /// <summary>
+        /// Creates labes for background grid
+        /// </summary>
         public void CountLables()
         {
             int i = -1;
@@ -1083,7 +1173,10 @@ namespace LiveChart
                 i++;
             }
         }
-
+        /// <summary>
+        /// Creates labes for background grid
+        /// </summary>
+        /// <param name="xAxisValue"></param>
         public void CountLables(XAxisValue xAxisValue)
         {
             double valueOfOneLineLabel = (Convert.ToDouble(DataCount) / _lineCountVertical);
@@ -1123,6 +1216,11 @@ namespace LiveChart
                 i++;
             }
         }
+        /// <summary>
+        /// Handling event when chart changes its size
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         private void Resize(double? width, double? height)
         {
             double width1 = width ?? ActualWidth;
@@ -1207,7 +1305,9 @@ namespace LiveChart
                 SetGridBackground();
             }
         }
-
+        /// <summary>
+        /// Forcing resizing of chart
+        /// </summary>
         public void ForceResize()
         {
             Resize(null, null);

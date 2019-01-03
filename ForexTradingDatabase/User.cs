@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace ForexTradingDatabase
 {
+
+    /// <summary>
+    /// Class for user in database
+    /// </summary>
     [Serializable]
     public class User
     {
@@ -15,6 +19,13 @@ namespace ForexTradingDatabase
         {
         }
 
+        /// <summary>
+        /// Constructor for user
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="sureName"></param>
+        /// <param name="password"></param>
         public User(string email, string name, string sureName, string password)
         {
             Email = email;

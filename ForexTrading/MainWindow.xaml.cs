@@ -21,12 +21,10 @@ using ForexTrading.Pages;
 namespace ForexTrading
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Main widow of client aplication
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        //TODO: Loading pri nacitavani
-        //TODO: Historia
         //Pages
         private Login_Page Login_Page;
         private Register_Page Register_Page;
@@ -48,6 +46,18 @@ namespace ForexTrading
             }
         }
 
+        public string IsMaxed
+        {
+            get { return _isMaxed; }
+            set
+            {
+                _isMaxed = value;
+                OnPropertyChanged("IsMaxed");
+            }
+        }
+        /// <summary>
+        /// Constructor for main window
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -67,23 +77,17 @@ namespace ForexTrading
 
         }
 
-        public string IsMaxed
-        {
-            get { return _isMaxed; }
-            set
-            {
-                _isMaxed = value;
-                OnPropertyChanged("IsMaxed");
-            }
-        }
-
-
+        /// <summary>
+        /// Shows login page
+        /// </summary>
         public void ShowLoginPage()
         {
             OtherPage = "Register";
             Frame_Main.Content = Login_Page;
         }
-
+        /// <summary>
+        /// Shows forex page
+        /// </summary>
         public void ShowForexPage()
         {
             Forex_Page = new ForexPage(Core);
@@ -92,7 +96,9 @@ namespace ForexTrading
             Frame_Main.Content = Forex_Page;
            
         }
-
+        /// <summary>
+        /// Shows register page
+        /// </summary>
         public void ShowRegisterPage()
         {
             OtherPage = "Log in";
@@ -123,12 +129,20 @@ namespace ForexTrading
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
+        /// <summary>
+        /// Action for closing application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
             Core.CloseConnection();
         }
-
+        /// <summary>
+        /// Changes login and register page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OtherPage_Click(object sender, MouseButtonEventArgs e)
         {
             if (OtherPage == "Register")

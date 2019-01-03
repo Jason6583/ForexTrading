@@ -53,7 +53,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Text="{Binding UserEmail}" 
-                   Style="{StaticResource MenuTextBlockStyle}" 
+                   Style="{StaticResource ClassicTextBlockStyle}" 
                    HorizontalAlignment="Right"
                    FontSize="15"
                    Margin="5"
@@ -104,7 +104,7 @@
 
                 <ContentPresenter Content="{Binding ActivePortfolio}" 
                                   ContentTemplate="{StaticResource MenuItemTemplate}"
-                                  MouseLeftButtonDown="SideMenu_TotalPortfolio_MouseLeftButtonDown" 
+                                  MouseLeftButtonDown="SideMenu_ActivePortfolio_MouseLeftButtonDown" 
                                   x:Name="SideMenu_ActivePortfolio"/>
 
 
@@ -118,11 +118,11 @@
             <Frame x:Name="Frame_Menu" Grid.Column="1"/>
 
             <linechart:LiveChartControl Grid.Column="2" 
-                                        x:Name="EurUsdChart" 
+                                        x:Name="ForexChart" 
                                         LineColor="#FFF1C9A0" 
                                         DotColor="#FFFFF9F4" 
                                         AxisColor="#FF212121" 
-                                        DataSource="{Binding EurUsD}" 
+                                        DataSource="{Binding ForexData}" 
                                         Foreground="{StaticResource LightGold}" 
                                         FontSize="15"
                                         MinValue="0.075" 
@@ -133,7 +133,7 @@
                                         YAxisUnitStringFormat="N5"
                                         GridLineColor="#19383838" 
                                         Margin="15" 
-                                        Loaded="EurUsdChart_Loaded" 
+                                        Loaded="ForexChart_Loaded" 
                                        
                                         >
 

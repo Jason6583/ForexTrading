@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ForexTradingWcfServiceLibrary
 {
+    /// <summary>
+    /// Interface for callback client 
+    /// </summary>
     public interface ITradingForexClient
     {
         [OperationContract(IsOneWay = true)]

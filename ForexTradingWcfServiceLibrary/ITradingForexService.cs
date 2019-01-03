@@ -7,6 +7,9 @@ using System.Text;
 
 namespace ForexTradingWcfServiceLibrary
 {
+    /// <summary>
+    /// Interface for wcf service
+    /// </summary>
     [ServiceContract(CallbackContract = typeof(ITradingForexClient))]
     public interface ITradingForexService
     {
@@ -38,7 +41,9 @@ namespace ForexTradingWcfServiceLibrary
 
 
     }
-
+    /// <summary>
+    /// Datacontract class for service with forex data
+    /// </summary>
     [DataContract]
     public class ForexData
     {
