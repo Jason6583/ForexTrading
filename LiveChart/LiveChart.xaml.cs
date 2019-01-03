@@ -1,28 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.ComponentModel;
 using System.Windows.Interop;
 using System.Windows.Media.Effects;
-using System.Windows.Threading;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using Label = System.Windows.Controls.Label;
 using UserControl = System.Windows.Controls.UserControl;
@@ -1056,23 +1044,27 @@ namespace LiveChart
             double valueOfFontSize = (ActualWidth / _lineCountVertical) / 7;
             for (int i = 0; i < _lineCountVertical * 1.2; i++)
             {
-                Line line = new Line();
+                Line line = new Line
+                {
+                    X1 = valueOfSpreadVertical * i,
+                    X2 = valueOfSpreadVertical * i,
+                    Y1 = 0,
+                    Y2 = CanvasMain.ActualHeight,
+                    Stroke = GridLineColor,
+                    StrokeThickness = 2
+                };
 
-                line.X1 = valueOfSpreadVertical * i;
-                line.X2 = valueOfSpreadVertical * i;
-                line.Y1 = 0;
-                line.Y2 = CanvasMain.ActualHeight;
 
-                line.Stroke = GridLineColor;
-                line.StrokeThickness = 2;
 
                 Canvas.SetZIndex(line, -500);
                 CanvasMain.Children.Add(line);
 
-                Label label = new Label();
-                label.FontSize = Convert.ToInt32(valueOfFontSize).LimitToRange(1, 15);
-                label.FontFamily = Label_MaxY.FontFamily;
-                label.Foreground = Label_MaxY.Foreground;
+                Label label = new Label
+                {
+                    FontSize = Convert.ToInt32(valueOfFontSize).LimitToRange(1, 15),
+                    FontFamily = Label_MaxY.FontFamily,
+                    Foreground = Label_MaxY.Foreground
+                };
 
                 //Content
 
@@ -1138,10 +1130,12 @@ namespace LiveChart
                 Canvas.SetZIndex(line, -500);
                 CanvasMain.Children.Add(line);
 
-                Label label = new Label();
-                label.FontSize = Label_MaxY.FontSize;
-                label.FontFamily = Label_MaxY.FontFamily;
-                label.Foreground = Label_MaxY.Foreground;
+                Label label = new Label
+                {
+                    FontSize = Label_MaxY.FontSize,
+                    FontFamily = Label_MaxY.FontFamily,
+                    Foreground = Label_MaxY.Foreground
+                };
 
                 Grid_YAxisScale.Children.Add(label);
                 _gridBackground.labelsHorizontal.Add(label);

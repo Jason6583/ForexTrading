@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using ForexTrading.Windows;
 using ForexTradingWcfServiceLibrary;
 
@@ -153,7 +150,7 @@ namespace ForexTrading.Core
                         throw new ArgumentException("Wrong email or password");
                     }
                 }
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
                     throw;
                 }
@@ -161,7 +158,7 @@ namespace ForexTrading.Core
                 {
                     throw new EndpointNotFoundException("Server is currently offline");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     ThreadPool.QueueUserWorkItem(new WaitCallback(
                         (obj) => { _tradingServiceClient = proxy.CreateChannel(); }));

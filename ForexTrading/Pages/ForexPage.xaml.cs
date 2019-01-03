@@ -2,24 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using ForexTrading.Annotations;
-using ForexTrading.Windows;
 using ForexTrading.Pages.ForexPage_Pages;
 
 
@@ -171,9 +160,7 @@ namespace ForexTrading.Pages
             BuyAsset[0] = "BUY";
             BuyAsset[1] = "ASSET";
 
-            _sideMenuItems = new List<ContentPresenter>();
-            _sideMenuItems.Add(SideMenu_ActivePortfolio);
-            _sideMenuItems.Add(SideMenu_History);
+            _sideMenuItems = new List<ContentPresenter> {SideMenu_ActivePortfolio, SideMenu_History};
 
             //Inicializing pages
 
@@ -345,8 +332,7 @@ namespace ForexTrading.Pages
 
             for (int j = 0; j < rows; j++)
             {
-                RowDefinition c1 = new RowDefinition();
-                c1.Height = new GridLength(25);
+                RowDefinition c1 = new RowDefinition {Height = new GridLength(25)};
                 Grid_TraidingPairs.RowDefinitions.Add(c1);
             }
         }

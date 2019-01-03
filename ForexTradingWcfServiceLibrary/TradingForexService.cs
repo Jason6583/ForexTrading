@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.EntityClient;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.Text;
 using System.Timers;
 using ForexTradingDatabase;
 
@@ -52,8 +48,7 @@ namespace ForexTradingWcfServiceLibrary
             User user = forexTradingContext.Users.SingleOrDefault(x => x.Email == email);
             var conn = OperationContext.Current.GetCallbackChannel<ITradingForexClient>();
 
-            KeyValuePair<string, TradingPair> connectedUser;
-            _clients.TryGetValue(conn, out connectedUser);
+            _clients.TryGetValue(conn, out var connectedUser);
 
             if (connectedUser.Key == null)
             {
@@ -118,8 +113,7 @@ namespace ForexTradingWcfServiceLibrary
             ForexTradingContext _forexTradingContext = new ForexTradingContext();
 
             var conn = OperationContext.Current.GetCallbackChannel<ITradingForexClient>();
-            KeyValuePair<string, TradingPair> user;
-            _clients.TryGetValue(conn, out user);
+            _clients.TryGetValue(conn, out var user);
 
 
             var tradingPairFoo = (from x in _forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
@@ -168,8 +162,7 @@ namespace ForexTradingWcfServiceLibrary
                          select x).First();
 
 
-            KeyValuePair<string, TradingPair> user;
-            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out var user);
 
 
             forexTradingContext.PortFolioDatas.Add(new PortFolioData()
@@ -229,8 +222,7 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
-            KeyValuePair<string, TradingPair> user;
-            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out var user);
             ForexTradingContext _forexTradingContext = new ForexTradingContext();
 
             try
@@ -316,7 +308,7 @@ namespace ForexTradingWcfServiceLibrary
 
                 return keyValuePair;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new KeyValuePair<string[], List<string[]>>();
             }
@@ -327,8 +319,7 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolioHistory()
         {
-            KeyValuePair<string, TradingPair> user;
-            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out var user);
             ForexTradingContext _forexTradingContext = new ForexTradingContext();
 
             try
@@ -416,7 +407,7 @@ namespace ForexTradingWcfServiceLibrary
 
                 return keyValuePair;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new KeyValuePair<string[], List<string[]>>();
             }
@@ -504,7 +495,7 @@ namespace ForexTradingWcfServiceLibrary
                         }));
                        
                     }
-                    catch (ObjectDisposedException ex)
+                    catch (ObjectDisposedException)
                     {
                         string message = $"{_serverTime} {user.Value.Key} was disconeted";
                         Console.WriteLine(message);
