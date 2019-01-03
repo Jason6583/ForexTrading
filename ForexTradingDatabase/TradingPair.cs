@@ -18,6 +18,7 @@ namespace ForexTradingDatabase
         {
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int Id { get; set; }
         public string FirstAssetName { get; set; }

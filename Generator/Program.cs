@@ -19,7 +19,7 @@ namespace Generator
         {
             forexTradingContex = new ForexTradingContext();
 
-           AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_EURGBP_M1_2017.csv", "EUR", "GBP");
+            AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_CHFJPY_M1_2017.csv", "CHF", "JPY");
 
 
         }
@@ -30,11 +30,12 @@ namespace Generator
         /// <returns></returns>
         public static Asset AddAsset(string name)
         {
+
             Asset asset = new Asset() { Name = name };
             forexTradingContex.Assets.Add(asset);
             forexTradingContex.SaveChanges();
-
             return asset;
+
         }
 
         /// <summary>
@@ -42,14 +43,34 @@ namespace Generator
         /// </summary>
         /// <param name="idFIrst"></param>
         /// <param name="idSecond"></param>
-        public static void AddTradingPair(string idFIrst, string idSecond)
+        public static void AddTradingPair(string idFirst, string idSecond)
         {
-            forexTradingContex.TraidingPairs.Add(new TradingPair()
+            var first = (from x in forexTradingContex.Assets where x.Name == idFirst select x).FirstOrDefault();
+            var second = (from x in forexTradingContex.Assets where x.Name == idSecond select x).FirstOrDefault();
+
+            if (first == null)
             {
-                FirstAssetName = idFIrst,
-                SecondAssetName = idSecond
-            });
-            forexTradingContex.SaveChanges();
+                first = AddAsset(idFirst);
+            }
+            if (second == null)
+            {
+                second = AddAsset(idSecond);
+            }
+
+            var tradingPair = (from x in forexTradingContex.TraidingPairs where x.FirstAssetName == idFirst where x.SecondAssetName == idSecond select x).FirstOrDefault();
+
+            if (tradingPair == null)
+            {
+                forexTradingContex.TraidingPairs.Add(new TradingPair()
+                {
+                    FirstAssetName = first.Name,
+                    SecondAssetName = second.Name
+                });
+
+                forexTradingContex.SaveChanges();
+            }
+            else
+                throw new ArgumentException("Trading pair aleready exists in database");
         }
 
         /// <summary>
@@ -60,12 +81,6 @@ namespace Generator
         /// <param name="idSecond"></param>
         public static void AddData(string nameOfFIle, string idFirst, string idSecond)
         {
-
-            //var first = AddAsset(idFirst);
-            var second = AddAsset(idSecond); ;
-
-            var asset1 = (from x in forexTradingContex.Assets where x.Name == "EUR" select x).SingleOrDefault();
-            //var asset2 = (from x in forexTradingContex.Assets where x.Name == "USD" select x).SingleOrDefault();
 
             AddTradingPair(idFirst, idSecond);
 

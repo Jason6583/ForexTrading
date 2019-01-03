@@ -376,9 +376,13 @@ namespace ForexTrading.Pages
             if (ActualTradingPair != ((TextBlock)sender).Text)
             {
                 ActualTradingPair = ((TextBlock)sender).Text;
+                var forexData = _core.GetData(DataCount, ActualTradingPair);
+              
+                ForexChart.MaxValue = forexData[0].Value * 0.005;
+                ForexChart.MinValue = forexData[0].Value * 0.002;
                 ForexChart.Clear();
 
-                var forexData = _core.GetData(DataCount, ActualTradingPair);
+
                 ForexChart.Load(new ObservableCollection<KeyValuePair<DateTime, double>>(forexData));
             }
         }
