@@ -19,6 +19,7 @@ namespace Generator
         {
             forexTradingContex = new ForexTradingContext();
 
+         
             AddData("C:/Users/Roman Pecho/Desktop/DAT_MT_CHFJPY_M1_2017.csv", "CHF", "JPY");
 
 

@@ -71,7 +71,33 @@ namespace ForexTrading.Core
                     _tradingServiceClient = proxy.CreateChannel();
                 }));
 
+            instanceContext.Closed += InstanceContext_Closed;
+            instanceContext.Faulted += InstanceContext_Faulted;
+
         }
+
+        private void InstanceContext_Faulted(object sender, EventArgs e)
+        {
+            instanceContext = new InstanceContext(_client);
+            proxy = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
+            ThreadPool.QueueUserWorkItem(new WaitCallback(
+                (obj) =>
+                {
+                    _tradingServiceClient = proxy.CreateChannel();
+                }));
+        }
+
+        private void InstanceContext_Closed(object sender, EventArgs e)
+        {
+            instanceContext = new InstanceContext(_client);
+            proxy = new DuplexChannelFactory<ITradingForexService>(instanceContext, "TradingService");
+            ThreadPool.QueueUserWorkItem(new WaitCallback(
+                (obj) =>
+                {
+                    _tradingServiceClient = proxy.CreateChannel();
+                }));
+        }
+
         private static DuplexChannelFactory<ITradingForexService> proxy;
 
         /// <summary>
@@ -155,7 +181,8 @@ namespace ForexTrading.Core
         {
             try
             {
-                _tradingServiceClient.RegisterUser(name, surename, email, password);
+                if (!_tradingServiceClient.RegisterUser(name, surename, email, password))
+                    throw new Exception("User with this email is allready registered");
             }
             catch (Exception)
             {
@@ -225,8 +252,6 @@ namespace ForexTrading.Core
             KeyValuePair<string[], List<string[]>> foo = new KeyValuePair<string[], List<string[]>>();
 
             foo = _tradingServiceClient.GetPortFolio();
-
-
             return foo;
         }
         /// <summary>

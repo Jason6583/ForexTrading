@@ -63,7 +63,7 @@ namespace ForexTrading
             InitializeComponent();
             DataContext = this;
             Core = new Core.Core();
-            Core.LoginUser("pecho4@gmail.com", "1111");
+            //Core.LoginUser("pecho4@gmail.com", "1111");
 
             //Iniciliazing pages
             Login_Page = new Login_Page(this);
@@ -71,8 +71,8 @@ namespace ForexTrading
           
 
             //Iniciliazing frame
-            //ShowLoginPage();
-            ShowForexPage();
+            ShowLoginPage();
+            //ShowForexPage();
             WindowTitle = "Trading forex";
 
         }

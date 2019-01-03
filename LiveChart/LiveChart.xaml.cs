@@ -434,8 +434,11 @@ namespace LiveChart
             {
                 if (_pathFigureOfMainLine.Segments.Count > 0)
                 {
-                    _pathFigureOfMainLine.Segments[i].BeginAnimation(LineSegment.PointProperty, null);
-                    ((LineSegment)_pathFigureOfMainLine.Segments[i]).Point = pointsY[i];
+                    if (_pathFigureOfMainLine.Segments.Count > i)
+                    {
+                        _pathFigureOfMainLine.Segments[i].BeginAnimation(LineSegment.PointProperty, null);
+                        ((LineSegment) _pathFigureOfMainLine.Segments[i]).Point = pointsY[i];
+                    }
                 }
             }
         }

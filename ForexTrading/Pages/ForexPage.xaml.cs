@@ -215,10 +215,17 @@ namespace ForexTrading.Pages
             }
 
             if (_isSideMenuUp)
-                Task.Run(() =>
-                {
-                    _activePortfolio_Page.LoadPortfolio(_core.GetPortFolio());
-                });
+            {
+                ReloadPortfolio();
+            }
+        }
+
+        private async void ReloadPortfolio()
+        {
+            Task<KeyValuePair<string[], List<string[]>>> task = new Task<KeyValuePair<string[], List<string[]>>>(_core.GetPortFolio);
+            task.Start();
+            var result = await task;
+            _activePortfolio_Page.LoadPortfolio(result);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -377,7 +384,7 @@ namespace ForexTrading.Pages
             {
                 ActualTradingPair = ((TextBlock)sender).Text;
                 var forexData = _core.GetData(DataCount, ActualTradingPair);
-              
+
                 ForexChart.MaxValue = forexData[0].Value * 0.005;
                 ForexChart.MinValue = forexData[0].Value * 0.002;
                 ForexChart.Clear();

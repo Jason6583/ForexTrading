@@ -34,7 +34,7 @@ namespace ForexTradingDatabase
 
             }
 
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
+            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<ForexTradingContext, Configuration>());
         }
         /// <summary>
         /// Fiding actual solution directory

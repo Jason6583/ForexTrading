@@ -19,24 +19,25 @@ namespace ForexTradingWcfServiceLibrary
         UseSynchronizationContext = false)]
     public class TradingForexService : ITradingForexService
     {
-        private ITradingForexClient _user;
-        private string _selectedPair;
-        private static ForexTradingContext _forexTradingContext;
         private static DateTime _serverTime = new DateTime(2017, 1, 2, 11, 1, 0);
-        private TradingPair _actualTradingPair;
-        User _actualUser;
         Queue<string> logs;
+        private Dictionary<ITradingForexClient, KeyValuePair<string, TradingPair>> _clients;
+        private TradingPair _defaultTradingPair;
         /// <summary>
         /// Constructor for service
         /// </summary>
         public TradingForexService()
         {
-            _forexTradingContext = new ForexTradingContext();
+            ForexTradingContext forexTradingContext = new ForexTradingContext();
+            _clients = new Dictionary<ITradingForexClient, KeyValuePair<string, TradingPair>>();
+            logs = new Queue<string>();
+
+            _defaultTradingPair = (from x in forexTradingContext.TraidingPairs select x).FirstOrDefault();
+
             System.Timers.Timer aTimer = new System.Timers.Timer();
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 500;
             aTimer.Enabled = true;
-            logs = new Queue<string>();
 
         }
         /// <summary>
@@ -47,21 +48,28 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public bool LoginUser(string email, string password)
         {
-            _actualTradingPair = (from x in _forexTradingContext.TraidingPairs select x).FirstOrDefault();
-            User user = _forexTradingContext.Users.SingleOrDefault(x => x.Email == email);
+            ForexTradingContext forexTradingContext = new ForexTradingContext();
+            User user = forexTradingContext.Users.SingleOrDefault(x => x.Email == email);
             var conn = OperationContext.Current.GetCallbackChannel<ITradingForexClient>();
 
-            if (user != null)
-            {
-                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
-                {
-                    _actualUser = user;
-                    _user = conn;
+            KeyValuePair<string, TradingPair> connectedUser;
+            _clients.TryGetValue(conn, out connectedUser);
 
-                    string message = $"{_serverTime} {_actualUser.Email} was connected";
-                    Console.WriteLine(message);
-                    logs.Enqueue(message);
-                    return true;
+            if (connectedUser.Key == null)
+            {
+                if (user != null)
+                {
+                    if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                    {
+                        _clients.Add(conn, new KeyValuePair<string, TradingPair>(email, _defaultTradingPair));
+
+                        string message = $"{_serverTime} {email} was connected";
+                        Console.WriteLine(message);
+                        logs.Enqueue(message);
+                        return true;
+                    }
+                    else
+                        return false;
                 }
                 else
                     return false;
@@ -79,12 +87,25 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public bool RegisterUser(string name, string surename, string email, string password)
         {
-            var pass = BCrypt.Net.BCrypt.HashPassword(password);
-            User user = new User(email, name, surename, pass);
+            ForexTradingContext _forexTradingContext = new ForexTradingContext();
 
-            _forexTradingContext.Users.Add(user);
-            _forexTradingContext.SaveChanges();
-            return true;
+            var userFoo = (from x in _forexTradingContext.Users where x.Email == email select x).SingleOrDefault();
+            if (userFoo == null)
+                try
+                {
+                    var pass = BCrypt.Net.BCrypt.HashPassword(password);
+                    User user = new User(email, name, surename, pass);
+
+                    _forexTradingContext.Users.Add(user);
+                    _forexTradingContext.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+
+            return false;
         }
         /// <summary>
         /// Returns most recent forext data according to servertime
@@ -96,11 +117,17 @@ namespace ForexTradingWcfServiceLibrary
         {
             ForexTradingContext _forexTradingContext = new ForexTradingContext();
 
-            _actualTradingPair = (from x in _forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
+            var conn = OperationContext.Current.GetCallbackChannel<ITradingForexClient>();
+            KeyValuePair<string, TradingPair> user;
+            _clients.TryGetValue(conn, out user);
+
+
+            var tradingPairFoo = (from x in _forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
+            _clients[conn] = new KeyValuePair<string, TradingPair>(user.Key, tradingPairFoo);
 
             var data = (from x in _forexTradingContext.TraidingPairDatas
                         where x.Date < _serverTime
-                        where x.TradingPairId == _actualTradingPair.Id
+                        where x.TradingPairId == tradingPairFoo.Id
                         select x).ToList();
 
             var dataF = data.OrderByDescending(x => x.Date).ToList().Take(count);
@@ -116,8 +143,10 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public List<string> GetAllTradingPairs()
         {
+            ForexTradingContext _forexTradingContext = new ForexTradingContext();
             return (from x in _forexTradingContext.TraidingPairs select x.FullName)
                 .ToList();
+
         }
         /// <summary>
         /// Add new asset to users portfolio
@@ -132,17 +161,22 @@ namespace ForexTradingWcfServiceLibrary
 
             var tradingPairs = (from x in forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
 
-            var value = (from x in forexTradingContext.TraidingPairDatas                 
+            var value = (from x in forexTradingContext.TraidingPairDatas
                          where x.TradingPairId == tradingPairs.Id
                          where x.Date <= _serverTime
                          orderby x.Date descending
                          select x).First();
 
+
+            KeyValuePair<string, TradingPair> user;
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+
+
             forexTradingContext.PortFolioDatas.Add(new PortFolioData()
             {
                 TradingPairId = value.TradingPairId,
                 DateOfBuy = timeOfBuy,
-                UserEmail = _actualUser.Email,
+                UserEmail = user.Key,
                 Price = value.Value,
                 Investment = investment
             });
@@ -195,13 +229,17 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolio()
         {
+            KeyValuePair<string, TradingPair> user;
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+            ForexTradingContext _forexTradingContext = new ForexTradingContext();
+
             try
             {
                 var portfolio = (from x in
                         _forexTradingContext.PortFolioDatas
                                  join y in _forexTradingContext.TraidingPairs
                                  on x.TradingPairId equals y.Id
-                                 where x.UserEmail == _actualUser.Email
+                                 where x.UserEmail == user.Key
                                  where x.DateOfSold == null
                                  select new TradingDataFoo
                                  {
@@ -239,7 +277,7 @@ namespace ForexTradingWcfServiceLibrary
                     _forexTradingContext.PortFolioDatas
                                         join y in _forexTradingContext.TraidingPairs
                                         on x.TradingPairId equals y.Id
-                                        where x.UserEmail == _actualUser.Email
+                                        where x.UserEmail == user.Key
                                         where x.DateOfSold == null
                                         let value = ((((from v in _forexTradingContext.TraidingPairDatas
                                                         where v.Date <= _serverTime
@@ -263,8 +301,9 @@ namespace ForexTradingWcfServiceLibrary
 
 
                 var totalSum = portfolioSummary.Sum(x => x.values);
-                var totalPerc = portfolioSummary.Sum(x => x.perces) / portfolioSummary.Count();
+               
                 var totalInvestment = portfolioSummary.Sum(x => x.investmets);
+                var totalPerc = totalSum * 100 / totalInvestment;
 
                 var summary = new string[4];
                 summary[0] = portfolioSummary.Count().ToString();
@@ -288,6 +327,10 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public KeyValuePair<string[], List<string[]>> GetPortFolioHistory()
         {
+            KeyValuePair<string, TradingPair> user;
+            _clients.TryGetValue(OperationContext.Current.GetCallbackChannel<ITradingForexClient>(), out user);
+            ForexTradingContext _forexTradingContext = new ForexTradingContext();
+
             try
             {
 
@@ -295,7 +338,7 @@ namespace ForexTradingWcfServiceLibrary
                         _forexTradingContext.PortFolioDatas
                                  join y in _forexTradingContext.TraidingPairs
                                  on x.TradingPairId equals y.Id
-                                 where x.UserEmail == _actualUser.Email
+                                 where x.UserEmail == user.Key
                                  where x.DateOfSold != null
                                  select new TradingDataFoo
                                  {
@@ -335,7 +378,7 @@ namespace ForexTradingWcfServiceLibrary
                     _forexTradingContext.PortFolioDatas
                                         join y in _forexTradingContext.TraidingPairs
                                        on x.TradingPairId equals y.Id
-                                        where x.UserEmail == _actualUser.Email
+                                        where x.UserEmail == user.Key
                                         where x.DateOfSold != null
                                         let value = ((((from v in _forexTradingContext.TraidingPairDatas
                                                         where v.Date <= x.DateOfSold
@@ -359,8 +402,8 @@ namespace ForexTradingWcfServiceLibrary
 
 
                 var totalSum = portfolioSummary.Sum(x => x.values);
-                var totalPerc = portfolioSummary.Sum(x => x.perces) / portfolioSummary.Count();
                 var totalInvestment = portfolioSummary.Sum(x => x.investmets);
+                var totalPerc = totalSum * 100 / totalInvestment;
 
                 var summary = new string[4];
                 summary[0] = portfolioSummary.Count().ToString();
@@ -386,13 +429,17 @@ namespace ForexTradingWcfServiceLibrary
         /// <returns></returns>
         public double GetActualValue(string tradingPair)
         {
-            var tradingPairF = (from x in _forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
+            ForexTradingContext forexTradingContext = new ForexTradingContext();
+            var tradingPairF = (from x in forexTradingContext.TraidingPairs where x.FullName == tradingPair select x).FirstOrDefault();
 
-            return (from x in _forexTradingContext.TraidingPairDatas
+
+
+            return (from x in forexTradingContext.TraidingPairDatas
                     where x.Date <= _serverTime
                     where x.TradingPairId == tradingPairF.Id
                     orderby x.Date descending
                     select x.Value).First();
+
         }
         /// <summary>
         /// Convert database Forexdata to service ForexData
@@ -410,10 +457,11 @@ namespace ForexTradingWcfServiceLibrary
                     listOfData.Add(new KeyValuePair<long, double>(item.Date.Ticks, item.Value));
                 }
 
-                return new ForexData(_actualTradingPair.FullName, listOfData);
+                return new ForexData(_defaultTradingPair.FullName, listOfData);
             }
+            else
+                return null;
 
-            return null;
         }
         /// <summary>
         /// Writes logs to server
@@ -436,39 +484,46 @@ namespace ForexTradingWcfServiceLibrary
         /// <param name="e"></param>
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
+            ForexTradingContext forexTradingContext = new ForexTradingContext();
             try
             {
-                if (_user != null)
+                foreach (var user in _clients)
                 {
-                    var data = (from x in _forexTradingContext.TraidingPairDatas
-                                where x.Date <= _serverTime
-                                where x.TradingPairId == _actualTradingPair.Id
-                                orderby x.Date descending
-                                select x).First();
-
-                    var pom = data;
-
-                    _user.ReceiveData(new ForexData(_actualTradingPair.FullName, new List<KeyValuePair<long, double>>()
+                    try
                     {
-                        new KeyValuePair<long, double>(data.Date.Ticks,data.Value)
-                    }));
-                }
+                        var data = (from x in forexTradingContext.TraidingPairDatas
+                                    where x.Date <= _serverTime
+                                    where x.TradingPairId == user.Value.Value.Id
+                                    orderby x.Date descending
+                                    select x).First();
 
-                _serverTime = _serverTime.AddMinutes(1);
-                WriteLogs();
-            }
-            catch(ObjectDisposedException ex)
-            {
-                string message = $"{_serverTime} {_actualUser.Email} was disconeted";
-                Console.WriteLine(message);
-                logs.Enqueue(message);
-                _user = null;
-                _actualUser = null;
+
+                        user.Key.ReceiveData(new ForexData(user.Value.Value.FullName, new List<KeyValuePair<long, double>>()
+                        {
+                            new KeyValuePair<long, double>(data.Date.Ticks,data.Value)
+                        }));
+                       
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+                        string message = $"{_serverTime} {user.Value.Key} was disconeted";
+                        Console.WriteLine(message);
+                        logs.Enqueue(message);
+                        _clients.Remove(user.Key);
+                    }
+
+                }
             }
             catch (Exception ex)
             {
+                
                 logs.Enqueue(ex.Message);
+                Console.WriteLine(ex.Message);
             }
+
+
+            _serverTime = _serverTime.AddMinutes(1);
+            WriteLogs();
         }
     }
 }
