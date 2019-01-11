@@ -963,15 +963,6 @@ namespace LiveChart
                 BlurRadius = 2
             };
 
-            _mainLine.Effect = new DropShadowEffect
-            {
-                Color = ((SolidColorBrush)LineColor).Color,
-                Direction = 45,
-                ShadowDepth = 0,
-                Opacity = 0.1,
-                BlurRadius = 1
-            };
-
             Label_MinY.Margin = new Thickness(0, 0, 0, 0);
 
             XAxis.Stroke = AxisColor;
@@ -1228,9 +1219,6 @@ namespace LiveChart
 
             if (diffrenceWidth != 1 || diffrenceHeight != 1)
             {
-
-               
-                
 
                 //Line
                 foreach (LineSegment lineSegment in _pathFigureOfMainLine.Segments)

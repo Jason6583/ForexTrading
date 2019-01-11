@@ -432,6 +432,7 @@ namespace ForexTradingWcfServiceLibrary
                     select x.Value).First();
 
         }
+
         /// <summary>
         /// Convert database Forexdata to service ForexData
         /// </summary>
@@ -454,6 +455,7 @@ namespace ForexTradingWcfServiceLibrary
                 return null;
 
         }
+
         /// <summary>
         /// Writes logs to server
         /// </summary>
@@ -468,6 +470,7 @@ namespace ForexTradingWcfServiceLibrary
                 Console.WriteLine(log);
             }
         }
+
         /// <summary>
         /// Handling event when server sends trading pair data to user
         /// </summary>
@@ -502,14 +505,11 @@ namespace ForexTradingWcfServiceLibrary
                         logs.Enqueue(message);
                         _clients.Remove(user.Key);
                     }
-
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 
-                logs.Enqueue(ex.Message);
-                Console.WriteLine(ex.Message);
             }
 
 

@@ -59,14 +59,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ForexTradingWcfServiceLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ForexTradingWcfServiceLibrary\bin\x64\Debug\ForexTradingWcfServiceLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="LiveChart, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\LiveChart\bin\x64\Debug\LiveChart.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -184,6 +176,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ForexTradingWcfServiceLibrary\ForexTradingWcfServiceLibrary.csproj">
+      <Project>{f7280750-dccc-4b6b-a1b8-477f80cc605a}</Project>
+      <Name>ForexTradingWcfServiceLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LiveChart\LiveChart.csproj">
+      <Project>{210993a9-ed07-45c6-8641-2de37d65a161}</Project>
+      <Name>LiveChart</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
