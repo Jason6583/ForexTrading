@@ -23,4 +23,4 @@ Users have to register or log in into aplication.
 Users are able to buy, sell assets.
 Users are able to see their porfolios.
 
-More information is in slovak documentation inside of project.
+More information is in slovak documentation inside of repository.
