@@ -178,6 +178,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ForexTradingWcfServiceLibrary\ForexTradingWcfServiceLibrary.csproj">
       <Project>{f7280750-dccc-4b6b-a1b8-477f80cc605a}</Project>
       <Name>ForexTradingWcfServiceLibrary</Name>
